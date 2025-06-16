@@ -1,0 +1,226 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Tempo de geração: 04/06/2025 às 13:35
+-- Versão do servidor: 10.4.32-MariaDB
+-- Versão do PHP: 8.0.30
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Banco de dados: `comandadigital`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `acessos`
+--
+
+CREATE TABLE `acessos` (
+  `ace_Id` int(11) NOT NULL,
+  `ace_Nome` varchar(30) NOT NULL,
+  `ace_Senha` int(6) NOT NULL,
+  `ace_Cargo` varchar(7) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `acessos`
+--
+
+INSERT INTO `acessos` (`ace_Id`, `ace_Nome`, `ace_Senha`, `ace_Cargo`) VALUES
+(1, 'Ronny', 1608, 'Admin'),
+(2, 'João', 1111, 'Funcio');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `comandaspendentes`
+--
+
+CREATE TABLE `comandaspendentes` (
+  `comp_Id` int(11) NOT NULL,
+  `comp_Cliente` varchar(30) NOT NULL,
+  `comp_Garcom` varchar(30) NOT NULL,
+  `comp_Valor` float NOT NULL,
+  `comp_Data` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `comandaspendentes`
+--
+
+INSERT INTO `comandaspendentes` (`comp_Id`, `comp_Cliente`, `comp_Garcom`, `comp_Valor`, `comp_Data`) VALUES
+(9, 'Igor', 'Douglas ', 11, '2025-06-02'),
+(10, 'Igor', 'Douglas ', 10.8, '2025-06-02');
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `estoque`
+--
+
+CREATE TABLE `estoque` (
+  `etq_Id` int(6) NOT NULL,
+  `etq_Nome` varchar(30) NOT NULL,
+  `etq_Categoria` varchar(15) NOT NULL,
+  `etq_Preco` float NOT NULL,
+  `etq_Unidade` char(3) NOT NULL,
+  `etq_Qtdunidade` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `estoque`
+--
+
+INSERT INTO `estoque` (`etq_Id`, `etq_Nome`, `etq_Categoria`, `etq_Preco`, `etq_Unidade`, `etq_Qtdunidade`) VALUES
+(1, 'Gado', 'periciveis', 7, 'Kg', 600),
+(5, 'Frango', 'Perecivel', 8, 'Kg', 600),
+(6, 'Linguiça', 'Perecivel', 4, 'Uni', 1),
+(8, 'Feijão ', 'periciveis', 10, 'g', 250),
+(15, 'Picanha', 'periciveis', 20, 'g', 250),
+(16, 'Arroz', 'periciveis', 8, 'g', 250);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `romaneio`
+--
+
+CREATE TABLE `romaneio` (
+  `rom_Id` int(11) NOT NULL,
+  `rom_Idproduto` int(11) NOT NULL,
+  `rom_Dataentrada` date NOT NULL,
+  `rom_Datavenci` date NOT NULL,
+  `rom_Quantidade` int(20) NOT NULL,
+  `rom_Preco` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `romaneio`
+--
+
+INSERT INTO `romaneio` (`rom_Id`, `rom_Idproduto`, `rom_Dataentrada`, `rom_Datavenci`, `rom_Quantidade`, `rom_Preco`) VALUES
+(1, 1, '2025-06-04', '2025-06-18', 15, 100),
+(2, 5, '2025-06-01', '2025-06-28', 0, 100),
+(3, 6, '2025-06-01', '2025-06-21', 0, 100),
+(9, 8, '2025-06-01', '2025-06-30', 0, 300),
+(11, 16, '2025-06-01', '2025-06-30', 0, 100),
+(12, 1, '2025-06-01', '2025-06-28', 2, 600),
+(14, 16, '2025-06-02', '2025-06-30', 3, 300),
+(15, 16, '2025-06-03', '2025-06-03', 2, 16);
+
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `vendas`
+--
+
+CREATE TABLE `vendas` (
+  `ven_Seq` int(6) NOT NULL,
+  `ven_Cliente` varchar(30) NOT NULL,
+  `ven_Garcom` varchar(30) NOT NULL,
+  `ven_Data` date NOT NULL,
+  `ven_Valor` float NOT NULL,
+  `ven_Mesa` int(3) NOT NULL,
+  `ven_Itens` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`ven_Itens`)),
+  `ven_Finalizada` char(1) DEFAULT 'N'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Despejando dados para a tabela `vendas`
+--
+
+INSERT INTO `vendas` (`ven_Seq`, `ven_Cliente`, `ven_Garcom`, `ven_Data`, `ven_Valor`, `ven_Mesa`, `ven_Itens`, `ven_Finalizada`) VALUES
+(62, 'teste1', 'João', '2025-06-02', 0, 1, '[]', 'S'),
+(63, 'João', 'João', '2025-06-02', 80, 1, '[{\"nome\":\"Gado\",\"quantidade\":16,\"preco_unitario\":5,\"subtotal\":80}]', 'S'),
+(64, 'teste2', 'João', '2025-06-02', 15, 2, '[{\"nome\":\"Gado\",\"quantidade\":3,\"preco_unitario\":5,\"subtotal\":15}]', 'S'),
+(65, 'teste3', 'João', '2025-06-02', 15, 3, '[{\"nome\":\"Gado\",\"quantidade\":3,\"preco_unitario\":5,\"subtotal\":15}]', 'S'),
+(66, 'João', 'João', '2025-06-02', 5, 1, '[{\"nome\":\"Porco\",\"quantidade\":1,\"preco_unitario\":5,\"subtotal\":5}]', 'S'),
+(67, 'João', 'João', '2025-06-02', 13, 12, '[{\"nome\":\"Gado\",\"quantidade\":1,\"preco_unitario\":5,\"subtotal\":5},{\"nome\":\"Baião\",\"quantidade\":1,\"preco_unitario\":8,\"subtotal\":8}]', 'S'),
+(68, 'Igor', 'João', '2025-06-02', 5, 12, '[{\"nome\":\"Calabresa\",\"quantidade\":1,\"preco_unitario\":5,\"subtotal\":5}]', 'S'),
+(69, 'Igor', 'João', '2025-06-02', 5, 1, '[{\"nome\":\"Linguiça\",\"quantidade\":1,\"preco_unitario\":5,\"subtotal\":5}]', 'S'),
+(70, 'Igor', 'João', '2025-06-02', 0, 1, '[]', 'S');
+
+--
+-- Índices para tabelas despejadas
+--
+
+--
+-- Índices de tabela `acessos`
+--
+ALTER TABLE `acessos`
+  ADD PRIMARY KEY (`ace_Id`);
+
+--
+-- Índices de tabela `comandaspendentes`
+--
+ALTER TABLE `comandaspendentes`
+  ADD PRIMARY KEY (`comp_Id`);
+
+--
+-- Índices de tabela `estoque`
+--
+ALTER TABLE `estoque`
+  ADD PRIMARY KEY (`etq_Id`);
+
+--
+-- Índices de tabela `romaneio`
+--
+ALTER TABLE `romaneio`
+  ADD PRIMARY KEY (`rom_Id`);
+
+--
+-- Índices de tabela `vendas`
+--
+ALTER TABLE `vendas`
+  ADD PRIMARY KEY (`ven_Seq`);
+
+--
+-- AUTO_INCREMENT para tabelas despejadas
+--
+
+--
+-- AUTO_INCREMENT de tabela `acessos`
+--
+ALTER TABLE `acessos`
+  MODIFY `ace_Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de tabela `comandaspendentes`
+--
+ALTER TABLE `comandaspendentes`
+  MODIFY `comp_Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT de tabela `estoque`
+--
+ALTER TABLE `estoque`
+  MODIFY `etq_Id` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT de tabela `romaneio`
+--
+ALTER TABLE `romaneio`
+  MODIFY `rom_Id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+
+--
+-- AUTO_INCREMENT de tabela `vendas`
+--
+ALTER TABLE `vendas`
+  MODIFY `ven_Seq` int(6) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
