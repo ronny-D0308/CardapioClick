@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="icon" href="Cardapioclick.ico" type="image/x-icon">
+    <script src="JS_Centraladm/js_modal.js"> </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ESSENCIAL -->
     <title>.: Estoque :.</title>
     <style>
@@ -15,6 +16,7 @@
             background-color:#da6c22;
             padding: 20px;
         }
+        /*
         nav {
             width: 100%;
             height: 40px; 
@@ -26,7 +28,7 @@
             align-items: center;
             gap: 30px;
             flex-wrap: wrap;
-            margin: 0 auto;     /* centraliza horizontalmente */
+            margin: 0 auto;
             box-sizing: border-box;
         }
         .navBar li {
@@ -40,6 +42,12 @@
             text-decoration: none;
             color: black;
         }
+        */
+
+        .title {
+          text-align: center;
+          font-size: 50px;
+        }
 
         .conteiner-relatorio {
             width: 80%;
@@ -50,9 +58,11 @@
             margin-top: 10%;
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 30px 5px;
             justify-content: center;      /* Centraliza o grid no container */
             justify-items: center;        /* Centraliza o conteúdo das células */
             align-items: center;          /* Centraliza verticalmente o conteúdo */
+            padding: 10px;
         }
 
         .comandas {
@@ -141,6 +151,8 @@
 <body>
     <a class="sair" style="text-decoration:none; " href="Central_adm.php"> <img src="imagens/left.png" width="40px" > </a>
 
+    <h1 class="title"> Caixa </h1>
+
 
     <!-- MENU | NAVBAR DA PAGINA 
     <nav>
@@ -190,16 +202,20 @@
         <?php
             $sql_geral = "SELECT *
                           FROM vendas
-                          WHERE ven_Finalizada <> 'N'
+                          WHERE ven_Finalizada <> 'S'
                           GROUP BY ven_Mesa;
                           ";
             $query_geral = mysqli_query($conn, $sql_geral);
 
-            while($linhas = mysqli_fetch_object($query_geral)) {
+            if (mysqli_num_rows($query_geral) > 0) {              
+              while($linhas = mysqli_fetch_object($query_geral)) {
 
-                echo "<div class='comandas' id='". $linhas->ven_Mesa ."' >
-                        <h1>Comanda: ". $linhas->ven_Mesa ."</h1>
-                      </div>";
+                  echo "<div class='comandas' id='". $linhas->ven_Mesa ."' >
+                          <h1>Comanda: ". $linhas->ven_Mesa ."</h1>
+                        </div>";
+              }
+            } else {
+                echo "<h2> Sem comandas fechadas </h2>";
             }
         ?>
     </div>
@@ -275,6 +291,9 @@
                     <td style="text-align: center;"></td>
                     <td style="text-align: right;"> ${item.quantidade}  X  ${item.preco.toFixed(2)}</td>
                     <td style="text-align: right;">R$ ${item.subtotal.toFixed(2)}</td>
+                    <td style="text-align: right;"> 
+                      <img class='remover-item' src='imagens/remove.png' width='20px' data-nome='${nome}' data-mesa='${primeiroItem.ven_Mesa}'>
+                    </td>
                   </tr>
                 `;
               }
@@ -331,6 +350,29 @@
 
     closeBtn.addEventListener('click', function() {
       modal.style.display = 'none';
+    });
+
+    modalContent.querySelectorAll('.remover-item').forEach(btn => {
+      btn.addEventListener('click', function () {
+        const itemNome = this.getAttribute('data-nome');
+        const mesaId = this.getAttribute('data-mesa');
+    
+        if (!itemNome || !mesaId) {
+          alert('Erro: nome ou mesa não informado.');
+          return;
+        }
+    
+        fetch(`Central_finalizarComanda.php?mesa=${mesaId}&item=${encodeURIComponent(itemNome)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.sucesso) {
+              window.location.reload();
+            } else {
+              alert("Erro ao remover item: " + data.erro);
+            }
+          })
+          .catch(err => console.error("Erro na requisição:", err));
+      });
     });
 
 </script>
