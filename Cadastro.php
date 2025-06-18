@@ -108,51 +108,9 @@ $usuario = $_SESSION['usuario'];
                 <select name="Cargo">
                     <option value="Funcio" > Garçom </option>
                     <option value="Admin" > Administrador </option>
-                    <option value="Caixa" > Caixa </option>
+                    <!-- <option value="Caixa" > Caixa </option> -->
                 </select>
             </span>
-            
-            <!--
-            <span>
-                <label for="unidade">Unidade:</label>
-                <select name="unidade">
-                    <option value="Kg" > Quilograma(Kg) </option>
-                    <option value="L" > Litro(L) </option>
-                    <option value="Und" > Unidade(und)</option>
-                    <option value="Pct" > Pacote(Pct)</option>
-                </select>
-            </span>
-            
-            <span>
-                <label for="quantidade">Quantidade:</label>
-                <div style="display: flex; align-items: center; gap: 10px">
-                    <button type="button" onclick="alterarQuantidade(-1)">−</button>
-                    <input type="text" name="quantidade" id="quantidade" value="0" min="0">
-                    <button type="button" onclick="alterarQuantidade(1)">+</button>
-                </div>
-            </span>
-
-            <span>
-                <label for="preco">Preço:</label>
-                <input type="text" name="preco" id="preco">
-            </span>
-            
-            <span>
-                <label for="fornecedor">Fornecedor:</label>
-                <input type="text" name="fornecedor" id="fornecedor">
-            </span>
-            
-            <span>
-                <label for="Dataentrada">Data de Validade:</label>
-                <input type="date" name="Dataentrada" id="Dataentrada">
-            </span>
-            -->
-            
-            <!-- <span>
-                <label for="fornecedor">Código:</label>
-                <input type="text" name="fornecedor" id="fornecedor">
-            </span> -->
-
             <div style="text-align: center; width: 100%">
                 <input class="botao" type="submit" name="" value="Cadastrar">
             </div>

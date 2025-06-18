@@ -1,4 +1,5 @@
 <?php
+include('forcar_erros.php');
 include('config.php');
 session_start();
 
@@ -166,6 +167,7 @@ if ($vendaExistente) {
     }
 
     $novoTotal = $teste + $totalAnterior;
+
     $itensJson = json_encode($itensAntigos, JSON_UNESCAPED_UNICODE);
 
     $stmtUpdate = $conn->prepare("UPDATE vendas SET ven_Itens = ?, ven_Valor = ? WHERE ven_Seq = ?");

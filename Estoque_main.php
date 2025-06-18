@@ -85,6 +85,9 @@ $query = mysqli_query($conn, $sql_del);
             text-align:center;
             padding: 10px;
         }
+        a {
+            text-decoration: none;
+        }
 
         @media print {
             body * {
@@ -105,9 +108,21 @@ $query = mysqli_query($conn, $sql_del);
           .navBar ul {
             margin-left: 0;
           }
+          .navBar li {
+            font-size: 15px;
+          }
 
           .conteiner-relatorio {
-            margin-top: 30%;
+            margin-top: 40%;
+          }
+          .card {
+            width: 150px; 
+            height: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 10px;
+            color: white;
+            text-align:center;
+            padding: 5px;
           }
         }
     </style>
@@ -178,12 +193,12 @@ $query = mysqli_query($conn, $sql_del);
                     }
 
                     if ($linhas->rom_Quantidade <= 3) {
-                        $sql = "SELECT etq_Nome FROM estoque WHERE etq_Id = ". $linhas->rom_Idproduto ."";
+                        $sql = "SELECT * FROM estoque WHERE etq_Id = ". $linhas->rom_Idproduto ."";
                         $query = mysqli_query($conn, $sql);
                         $linhasProd = mysqli_fetch_object($query);
-                        echo "<div class='card'>";
+                        echo "<a href='Estoq_entradaProd.php?entrada=S&id=". $linhasProd->etq_Id ."&categoria=". $linhasProd->etq_Categoria ."'> <div class='card'>";
                             echo "<h3> O produto (<font size='3px'>". $linhasProd->etq_Nome."</font>) está com estoque baixo </h3><p>". $linhas->rom_Quantidade ."</p>";
-                        echo "</div>";
+                        echo "</div> </a>";
                     }
             }
         ?>

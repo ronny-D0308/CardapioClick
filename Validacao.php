@@ -150,7 +150,7 @@
             <select name="cargo" required >
                 <option name="funcio" value="Funcio" >Funcionário</option>
                 <option name="adm" value="Admin" >Administrador</option>
-                <option name="adm" value="Caixa" >Caixa</option>
+                <!-- <option name="adm" value="Caixa" >Caixa</option> -->
             </select>
             
             <button class="butao" type="submit" id="submit" name="submit"> ACESSAR </button>
