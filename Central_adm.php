@@ -654,12 +654,12 @@
             $dataFinal = $_POST['dataFinal'];
 
             if ($tipoBusca == "por-mesa") {
-                $sql = "SELECT DATE_FORMAT(ven_Data, '%Y-%m') AS mes, COUNT(DISTINCT ven_Mesa) AS total_mesas 
+                $sql = "SELECT ven_Data, COUNT(DISTINCT CONCAT(ven_Data, '-', ven_Mesa)) AS total_mesas 
                         FROM vendas 
                         WHERE ven_Garcom = '$nomeBusca'  
                               AND ven_Data BETWEEN '$dataInicio' AND '$dataFinal' 
-                        GROUP BY mes
-                        ORDER BY mes ASC";
+                        GROUP BY ven_Data
+                        ORDER BY ven_Data ASC";
             } elseif ($tipoBusca == "por-valor") {
                 $sql = "SELECT ven_Data, ven_Garcom, SUM(ven_Valor) AS total_valor 
                         FROM vendas 
@@ -678,23 +678,28 @@
                 //echo $sql;
             $result = $conn->query($sql);
             if ($result && $result->num_rows > 0) {
-
-                while ($row = $result->fetch_assoc()) {
-                    if ($tipoBusca == "ticket") {
-                        $labels[] = date('m/Y', strtotime($row['ven_Data'])); // Ex: 05/06/2025
-                        $dados[] = round($row['total_venda'] / max($row['total_mesas'], 1), 2);
-                    } elseif ($tipoBusca == "por-valor") {
-                        $labels[] = date('d/m/Y', strtotime($row['ven_Data'])); // Ex: 05/06/2025
-                        $dados[] = (float) $row['total_valor'];
-                    } elseif ($tipoBusca == "por-mesa") {
-                        $labels[] = date('m/Y', strtotime($row['mes'])); // Ex: 05/06/2025
-                        $dados[] = (int) $row['total_mesas'];
+                if ($tipoBusca == "por-mesa") {
+                    $totalMesas = 0;
+                    while ($row = $result->fetch_assoc()) {
+                        $totalMesas += (int)$row['total_mesas'];
+                    }
+                    echo "<h2 style='text-align:center; color:white;'>Total de mesas atendidas: <strong>$totalMesas</strong></h2>";
+                } else {
+                    while ($row = $result->fetch_assoc()) {
+                        if ($tipoBusca == "ticket") {
+                            $labels[] = date('m/Y', strtotime($row['ven_Data']));
+                            $dados[] = round($row['total_venda'] / max($row['total_mesas'], 1), 2);
+                        } elseif ($tipoBusca == "por-valor") {
+                            
+                            $labels[] = date('d/m/Y', strtotime($row['ven_Data']));
+                            $dados[] = (float) $row['total_valor'];
+                        }
                     }
                 }
-
             } else {
-                echo "<p>Nenhum resultado encontrado.</p>";
+                echo "<p style='text-align:center; color:red;'>Nenhum resultado encontrado.</p>";
             }
+
             $conn->close();
         }
         ?>
@@ -703,7 +708,8 @@
         <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
         <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
 
-        <script>
+        <?php if ($tipoBusca !== "por-mesa") : ?>
+            <script>
             const labels = <?php echo json_encode($labels); ?>;
             const dados = <?php echo json_encode($dados); ?>;
             const tipoBusca = "<?php echo $tipoBusca ?? ''; ?>";
@@ -738,10 +744,10 @@
                     chart.draw();
                 });
             }
-        </script>
+            </script>
+        <?php endif; ?>
 
     </section>
-
 
 </body>
 </html>
