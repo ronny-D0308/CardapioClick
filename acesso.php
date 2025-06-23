@@ -22,16 +22,19 @@
                 if ($pass == $db_senha && $db_cargo == $cargo && $cargo == "Admin") {
                     $_SESSION["loggedin"] = true;
                     $_SESSION["usuario"] = $user;
+                    $_SESSION["nivel"] = $db_cargo;
                     header("location: Central_adm.php");
 
                 } elseif ($pass == $db_senha && $db_cargo == $cargo && $cargo == "Funcio") {
                     $_SESSION["leggedin"] = true;
                     $_SESSION["usuario"] = $user;
+                    $_SESSION["nivel"] = $db_cargo;
                     return header("location: Comandas.php");
 
                 } elseif ($pass == $db_senha && $db_cargo == $cargo && $cargo == "Caixa") {
                     $_SESSION["leggedin"] = true;
                     $_SESSION["usuario"] = $user;
+                    $_SESSION["nivel"] = $db_cargo;
                     return header("location: Caixa_main.php");
 
                 } else {

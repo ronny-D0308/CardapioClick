@@ -65,7 +65,8 @@
            padding-left: 10px;
         }
         .menu:hover {
-           width: 370px;
+            padding: 2px;
+           width: 450px;
            transition-duration: 2s;
         }
         a {
@@ -265,6 +266,7 @@
 
                     <div class="icon"> <a href="Estoque_main.php"> Estoque </a> </div>
                     <div class="icon"> <a href="Cadastro.php"> Cadastro </a> </div>
+                    <div class="icon"> <a href="Pedidosremov.php"> Pedidos removidos </a> </div>
                     <div class="icon"> <a href="Validacao.php"> Sair </a> </div>
                 </div>
             </div>

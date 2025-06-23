@@ -12,23 +12,30 @@ $dataatual = date("Y-m-d");
 $hora = date("H:i:s");
 
 // INSERIR O VALOR DO CAIXA
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $valor_digitado = mysqli_escape_string($conn, $_POST['ValorAbertura']);
-    $valor_tratado = str_replace(['.', ','], ['', '.'], $valor_digitado);
-    $ValorAbertura = floatval($valor_tratado);
-
-    $sql = "INSERT INTO caixa (cx_ValorAbertura, cx_DataAbertura, cx_HoraAbertura) 
-            VALUES($ValorAbertura, '$dataatual', '$hora')";
-    $query = mysqli_query($conn, $sql);
-    if ($query) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['ValorAbertura'])) {
+    // Verifica novamente se já há caixa aberto hoje
+    $verificaCaixa = mysqli_query($conn, "SELECT * FROM caixa WHERE cx_Fechado <> 'S' AND cx_DataAbertura = '$dataatual'");
+    if (mysqli_num_rows($verificaCaixa) > 0) {
         include 'avisoDinamico.php';
-        avisoDinamico("Caixa aberto", "#01B712");
-        //header("Refresh:3; url=Caixa_comandas.php");
+        avisoDinamico("Já existe um caixa aberto para hoje!", "#CB0606");
     } else {
-        include 'avisoDinamico.php';
-        avisoDinamico("Erro ao abrir o caixa", "#CB0606");
+        $valor_digitado = mysqli_escape_string($conn, $_POST['ValorAbertura']);
+        $valor_tratado = str_replace(['.', ','], ['', '.'], $valor_digitado);
+        $ValorAbertura = floatval($valor_tratado);
+
+        $sql = "INSERT INTO caixa (cx_ValorAbertura, cx_DataAbertura, cx_HoraAbertura) 
+                VALUES($ValorAbertura, '$dataatual', '$hora')";
+        $query = mysqli_query($conn, $sql);
+        if ($query) {
+            include 'avisoDinamico.php';
+            avisoDinamico("Caixa aberto", "#01B712");
+        } else {
+            include 'avisoDinamico.php';
+            avisoDinamico("Erro ao abrir o caixa", "#CB0606");
+        }
     }
 }
+
 
 $sql_cons = "SELECT * FROM caixa WHERE cx_Fechado <> 'S' AND cx_DataAbertura = '$dataatual'";
 $query_cons = mysqli_query($conn, $sql_cons);

@@ -1,3 +1,26 @@
+<?php
+// INSERIR O VALOR DO FECHAMENTO DO CAIXA
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['Valorfechamento'])) {
+    $valor_digitado = mysqli_escape_string($conn, $_POST['Valorfechamento']);
+    $valor_tratado = str_replace(['.', ','], ['', '.'], $valor_digitado);
+    $Valorfechamento = floatval($valor_tratado);
+
+    $sql = "UPDATE caixa 
+            SET cx_ValorFechamento = $Valorfechamento, cx_DataFechamento = '$dataatual', cx_HoraFechamento = '$hora', cx_Fechado = 'S'
+            WHERE cx_DataAbertura = '$dataatual';
+            ";
+    $query = mysqli_query($conn, $sql);
+    if ($query) {
+        include 'avisoDinamico.php';
+        avisoDinamico("Caixa fechado", "#01B712");
+        header("Refresh:2; url=Validacao.php");
+    } else {
+        include 'avisoDinamico.php';
+        avisoDinamico("Erro ao fechar o caixa", "#CB0606");
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,7 +28,9 @@
     <link rel="icon" href="Cardapioclick.ico" type="image/x-icon">
     <script src="JS_Centraladm/js_modal.js"> </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- ESSENCIAL -->
-    <title>.: Estoque :.</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <title>.: Caixa :.</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Kreon:wght@300..700&display=swap');
         *{
@@ -99,20 +124,60 @@
           overflow-y: auto;
         }
 
+        /* Estilo para o modal (janela centralizada) */
+        .fimcaixa {
+          display: none;
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+
+        .fimcaixa-content {
+          background-color: white;
+          padding: 20px;
+          border-radius: 10px;
+          max-width: 400px;
+          width: 80%;
+          max-height: 80%;
+          overflow-y: auto;
+        }
+        .fimcaixa-content form {
+          display: block;
+          text-align: center;
+        }
+        .fimcaixa-content form input {
+          height: 30px;
+          font-size: 20px; 
+          color: black;
+        }
+        .fimcaixa-content form button {
+          height: 30px;
+          font-size: 20px; 
+          color: black;
+        }
+
         .div-botao {
             width: 100%;
             text-align:center;
         }
 
         .close {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          font-size: 20px;
-          cursor: pointer;
-          color: red;
-          width: 100%;
-          height: 100%;
+            position: absolute;
+            top: 10px; /* Ajuste a posição em relação ao topo */
+            right: 10px; /* Ajuste a posição em relação à borda direita */
+            font-size: 20px;
+            cursor: pointer;
+            color: red;
+            z-index: 10; /* Corrige o z-index para um valor apropriado */
+            width: auto; /* Define o tamanho exato do botão, não 100% */
+            height: auto; /* Define o tamanho exato do botão, não 100% */
+            padding: 5px 10px; /* Opcional: adicione um padding para melhorar o clique */
         }
 
         .modal-content button {
@@ -120,6 +185,18 @@
             height: 30px;
             color: white;
             background-color: #da6c22;
+        }
+        .divFinaliza {
+          margin-top: 30px;
+          width: 100%;
+          text-align: center;
+        }
+        .divFinaliza button {
+          width: 150px;
+          height: 40px;
+          font-size: 20px;
+          border-radius: 10px;
+          border: none;
         }
 
         @media print {
@@ -131,7 +208,8 @@
         @media (max-width: 800px),
                (max-width: 600px),
                (max-width: 400px){
-
+          
+          /*
           .navBar {
             grid-template-columns: repeat(1, 2fr);
             grid-template-rows: repeat(4, 2fr);
@@ -140,16 +218,25 @@
 
           .navBar ul {
             margin-left: 0;
-          }
+          }*/
 
           .conteiner-relatorio {
             margin-top: 30%;
+            grid-template-columns: repeat(1, 2fr);
+            grid-template-rows: repeat(4, 2fr);
+            justify-content: start;
           }
         }
     </style>
+
+    <script>
+      $(document).ready(function(){
+         $('#valorfechamento').mask('#.##0,00', {reverse: true});
+      });
+    </script>
 </head>
 <body>
-    <a class="sair" style="text-decoration:none; " href="Central_adm.php"> <img src="imagens/left.png" width="40px" > </a>
+    <!-- <a class="sair" style="text-decoration:none; " href="Central_adm.php"> <img src="imagens/left.png" width="40px" > </a> -->
 
     <h1 class="title"> Caixa </h1>
 
@@ -195,6 +282,16 @@
         </div>
     </div>
 
+    <!-- MODAL PARA FINALIZAR O CAIXA -->
+    <div class="fimcaixa" id="fimcaixa">
+      <div class="fimcaixa-content">
+          <form action="" method="POST">
+              <h1> Fechamento do caixa </h1>
+              <input type="text" name="Valorfechamento" id="valorfechamento">
+              <button type="submit" name=""> Fechar </button>
+          </form>
+      </div>
+    </div>
 
     <!-- RELATORIOS DO ESTOQUE PARA ATUALIZAÇÃO (ESTOQUE EM FALTA, PERTO DE ACABAR) -->
     <div class="conteiner-relatorio">
@@ -203,7 +300,8 @@
             $sql_geral = "SELECT *
                           FROM vendas
                           WHERE ven_Finalizada <> 'S'
-                          GROUP BY ven_Mesa;
+                          GROUP BY ven_Mesa
+                          ORDER BY ven_Mesa;
                           ";
             $query_geral = mysqli_query($conn, $sql_geral);
 
@@ -218,7 +316,10 @@
                 echo "<h2> Sem comandas fechadas </h2>";
             }
         ?>
-    </div>
+
+        <!-- FINALIZAR O CAIXA -->
+      </div>
+      <div class="divFinaliza"> <button type="button" id="botaofim"> Finalizar caixa </button> </div>
 
 <script type="text/javascript">
     
@@ -227,18 +328,20 @@
     const closeBtn = document.querySelector('.close');
     const modalContent = document.getElementById('modal-content-body');
     const totalValue = document.getElementById('total-value');
+    const addItemBtn = document.getElementById("add-item");
+    const botaofim = document.getElementById("botaofim");
 
     comandas.forEach(comanda => {
       comanda.addEventListener('click', function () {
         const comandaId = comanda.id;
         selectedComanda = comanda;
-        console.log(selectedComanda);
-        console.log(comandaId);
+        //console.log(selectedComanda);
+        //console.log(comandaId);
 
         fetch(`verificar_comanda.php?mesa=${comandaId}`)
           .then(response => response.json())
           .then(data => {
-            console.log("retornou");
+            //console.log("retornou");
             itensDaComandaAtual = data.itens; // <- agora você tem acesso depois
             modalContent.innerHTML = '';
             let totalComanda = 0;
@@ -349,30 +452,80 @@
     });
 
     closeBtn.addEventListener('click', function() {
+      //alert("fechou a comanda");
       modal.style.display = 'none';
     });
 
-    modalContent.querySelectorAll('.remover-item').forEach(btn => {
-      btn.addEventListener('click', function () {
-        const itemNome = this.getAttribute('data-nome');
-        const mesaId = this.getAttribute('data-mesa');
-    
-        if (!itemNome || !mesaId) {
-          alert('Erro: nome ou mesa não informado.');
-          return;
-        }
-    
-        fetch(`Central_finalizarComanda.php?mesa=${mesaId}&item=${encodeURIComponent(itemNome)}`)
-          .then(res => res.json())
-          .then(data => {
-            if (data.sucesso) {
-              window.location.reload();
-            } else {
-              alert("Erro ao remover item: " + data.erro);
+    botaofim.addEventListener('click', function() {
+      //fimcaixa.classList.add('fimvisivel');
+      fimcaixa.style.display = 'flex';
+    });
+
+
+    modalContent.addEventListener('click', function (event) {
+        if (event.target.classList.contains('remover-item')) {
+            const itemNome = event.target.getAttribute('data-nome');
+            const mesaId = event.target.getAttribute('data-mesa');
+        
+            if (!itemNome || !mesaId) {
+                alert('Erro: nome ou mesa não informado.');
+                return;
             }
-          })
-          .catch(err => console.error("Erro na requisição:", err));
-      });
+          
+            // Exibe o prompt para o usuário digitar a justificativa
+            const justificativa = prompt(`Informe o motivo para remover o item "${itemNome}":`);
+          
+            if (justificativa) {
+                // Caso o usuário preencha, envia os dados para `registrajustificativa.php`
+                fetch(`registrajustificativa.php`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded' // Tipo de dados compatível com POST
+                    },
+                    body: `justificativa=${encodeURIComponent(justificativa)}&item=${encodeURIComponent(itemNome)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        // Exibe no console que a justificativa foi registrada
+                        console.log('Justificativa registrada com sucesso.');
+                    } else {
+                        // Exibe mensagem de erro caso algo dê errado
+                        alert('Erro ao registrar justificativa: ' + data.erro);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao enviar justificativa:', error);
+                });
+              
+                // O fluxo principal segue e tenta remover o item mesmo após enviar a justificativa
+                fetch(`Central_finalizarComanda.php?mesa=${mesaId}&item=${encodeURIComponent(itemNome)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.sucesso) {
+                            window.location.reload(); // Recarrega a página após sucesso
+                        } else {
+                            alert("Erro ao remover item: " + data.mensagem);
+                        }
+                    })
+                    .catch(err => console.error("Erro na requisição:", err));
+            } else {
+                // Caso o usuário cancele o prompt ou não preencha a justificativa
+                alert("Ação cancelada: é necessário fornecer uma justificativa para remover o item.");
+            }
+        }
+    });
+
+    addItemBtn.addEventListener('click', function () {
+        if (selectedComanda && selectedComanda.id) { // Verifica se tem uma comanda selecionada válida
+            const comandaId = selectedComanda.id; // Pega o ID da comanda selecionada
+            //console.log(`Adicionando itens para a comanda: ${comandaId}`);
+
+            // Redireciona para a página de adicionar itens para essa comanda
+            window.location.href = `Adicionar_itens.php?comandaId=${comandaId}`;
+        } else {
+            alert("Nenhuma comanda selecionada! Por favor, selecione uma comanda antes de adicionar itens.");
+        }
     });
 
 </script>

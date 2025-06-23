@@ -20,6 +20,7 @@ if (
 // 🔧 Dados da comanda
 $Cliente = $_POST['nome_cliente'];
 $Garcon = $_SESSION['usuario'];
+$nivel = $_SESSION['nivel'];
 $Mesa = $_POST['mesa'];
 $Total = floatval($_POST['total']);
 $itensOriginal = json_decode($_POST['itens_selecionados'], true);
@@ -115,33 +116,62 @@ $stmtBusca->close();
 
 
 if (count($itensParaInserir) === 0) {
-    echo "<!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset='UTF-8'>
-        <meta http-equiv='refresh' content='10;url=Comandas.php'>
-        <style>
-            body {
-                font-family: Arial;
-                background-color: #b88406;
-                padding: 20px;
-                color: white;
-            }
-            ul {
-                font-size: 20px;
-            }
-        </style>
-    </head>
-    <body>
-        <h1>Nenhum item pôde ser adicionado:</h1>
-        <ul>";
-    foreach ($mensagens as $msg) {
-        echo "<li>$msg</li>";
+    // Determinar a URL de redirecionamento com base no nível
+    $redirectUrl = '';
+    if ($nivel == 'Funcio') {
+        $redirectUrl = "Comandas.php";
+    } elseif ($nivel == 'Admin') {
+        $redirectUrl = "Central_adm.php";
+    } elseif ($nivel == 'Caixa') {
+        $redirectUrl = "Caixa_main.php";
     }
-    echo "</ul>
-        <p>Redirecionando em 10 segundos...</p>
-    </body>
-    </html>";
+
+    // Erro e mensagens em HTML com tempo de redirecionamento
+    $mensagensHTML = '';
+    foreach ($mensagens as $msg) {
+        $mensagensHTML .= "<li>$msg</li>";
+    }
+
+    // Construir saída HTML utilizando heredoc
+    echo <<<HTML
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta http-equiv="refresh" content="8;url=$redirectUrl"> <!-- Redirecionamento -->
+            <title>Nenhum item adicionado</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #b88406;
+                    padding: 20px;
+                    color: white;
+                    text-align: center;
+                }
+                ul {
+                    font-size: 18px;
+                    text-align: left;
+                    margin: 20px auto;
+                    display: inline-block;
+                }
+                h1 {
+                    font-size: 22px;
+                }
+                p {
+                    font-size: 16px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Nenhum item pôde ser adicionado:</h1>
+            <ul>
+                $mensagensHTML
+            </ul>
+            <p>Redirecionando em 10 segundos...</p>
+        </body>
+        </html>
+        HTML;
+
     exit();
 }
 
@@ -185,5 +215,11 @@ if ($vendaExistente) {
     }
 }
 
-header('Location: Comandas.php');
+if($nivel == 'Funcio') {
+    header('Location: Comandas.php');
+} elseif ($nivel == 'Admin') {
+    header('Location: Central_adm.php');
+} elseif ($nivel == 'Caixa') {
+    header('Location: Caixa_main.php');
+}
 ?>
