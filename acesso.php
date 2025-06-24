@@ -9,7 +9,7 @@
             $cargo = $_POST['cargo'];
             
 
-            $consul = "SELECT ace_Nome, ace_Senha, ace_Cargo FROM acessos WHERE ace_Nome = ?";
+            $consul = "SELECT ace_Nome, ace_Senha, ace_Cargo FROM acessos WHERE ace_Nome = ? AND ace_Ativo <> 'N'";
             $stmt = $conn->prepare($consul);
             $stmt->bind_param("s", $user);
             $stmt->execute();
@@ -31,13 +31,21 @@
                     $_SESSION["nivel"] = $db_cargo;
                     return header("location: Comandas.php");
 
-                } elseif ($pass == $db_senha && $db_cargo == $cargo && $cargo == "Caixa") {
-                    $_SESSION["leggedin"] = true;
+                }  elseif ($pass == $db_senha && $db_cargo == "Admin" && $cargo == "Caixa") {
+                    // Admin logando como Caixa
+                    $_SESSION["loggedin"] = true;
                     $_SESSION["usuario"] = $user;
                     $_SESSION["nivel"] = $db_cargo;
-                    return header("location: Caixa_main.php");
-
-                } else {
+                    header("location: Caixa_main.php");
+                                
+                } elseif ($pass == $db_senha && $db_cargo == "Caixa" && $cargo == "Caixa") {
+                    // Caixa padrão
+                    $_SESSION["loggedin"] = true;
+                    $_SESSION["usuario"] = $user;
+                    $_SESSION["nivel"] = $db_cargo;
+                    header("location: Caixa_main.php");
+                
+                }else {
                     include 'avisoDinamico.php';
                     avisoDinamico("Senha ou usuário inválida!", "#CF1414");
                     echo "
@@ -47,7 +55,11 @@
                 }
             
             } else {
-                echo "Usuário inválido!";
+                include 'avisoDinamico.php';
+                avisoDinamico("Usuário sem acesso", "#CF1414");
+                echo "<div style='width:100%; text-align: center; margin-top: 10%;' >
+                        <h3> <a href='Validacao.php'> Clique aqui </a> para voltar </h3>
+                      </div>";
             }
             $stmt->close();
         }
