@@ -315,7 +315,7 @@
 						<input name="B08" class="QUANT"  id="B08" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
-						<label class="nome">Àgua Fresh</label>
+						<label class="nome">Aquárius Fresh</label>
 						<input name="B9" class="QUANT"  id="B9" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">

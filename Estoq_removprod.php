@@ -118,9 +118,9 @@
 
         if (isset($_GET['buscaProd'])) {
             $buscaProd = $_GET['buscaProd'];
-            $sql_geral = "SELECT * FROM estoque WHERE etq_Nome LIKE '$buscaProd%'";
+            $sql_geral = "SELECT * FROM estoque WHERE etq_Nome LIKE '$buscaProd%' AND etq_Ativo <> 'N'";
         } else {
-            $sql_geral = "SELECT * FROM estoque";
+            $sql_geral = "SELECT * FROM estoque WHERE etq_Ativo <> 'N'";
         }
         $query_geral = mysqli_query($conn, $sql_geral);
         
@@ -147,7 +147,7 @@
                     <!-- <th>Fornecedor</th>
                     <th>Data de entrada</th>
                     <th>Data de vencimento</th> -->
-                    <th><img src="imagens/remove.png" width="20px" alt="Editar"></th>
+                    <th></th>
                 </tr>
             </thead>
 
@@ -178,7 +178,7 @@
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['excluirId'])) {
             $idExcluir = intval($_POST['excluirId']);
         
-            $sql_delete = "DELETE FROM estoque WHERE etq_Id = $idExcluir";
+            $sql_delete = "UPDATE estoque SET etq_Ativo = 'N' WHERE etq_Id = $idExcluir";
             $query_delete = mysqli_query($conn, $sql_delete);
         
             if ($query_delete) {

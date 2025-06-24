@@ -196,9 +196,11 @@ $query = mysqli_query($conn, $sql_del);
                         $sql = "SELECT * FROM estoque WHERE etq_Id = ". $linhas->rom_Idproduto ."";
                         $query = mysqli_query($conn, $sql);
                         $linhasProd = mysqli_fetch_object($query);
-                        echo "<a href='Estoq_entradaProd.php?entrada=S&id=". $linhasProd->etq_Id ."&categoria=". $linhasProd->etq_Categoria ."'> <div class='card'>";
-                            echo "<h3> O produto (<font size='3px'>". $linhasProd->etq_Nome."</font>) está com estoque baixo </h3><p>". $linhas->rom_Quantidade ."</p>";
-                        echo "</div> </a>";
+                        echo "<a href='Estoq_entradaProd.php?entrada=S&id=". $linhasProd->etq_Id ."&categoria=". $linhasProd->etq_Categoria ."'>";
+                            echo "<div class='card'>";
+                                echo "<h3> O produto (<font size='3px'>". $linhasProd->etq_Nome."</font>) está com estoque baixo </h3><p>". $linhas->rom_Quantidade ."</p>";
+                            echo "</div>";
+                        echo "</a>";
                     }
             }
         ?>

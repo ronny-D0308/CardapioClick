@@ -1,4 +1,7 @@
-<?php 
+<?php
+    error_reporting(0);       // Desativa todos os relatórios de erro
+    ini_set('display_errors', 0);  // Garante que os erros não sejam exibidos na tela
+
     include('config.php');
 	session_start();
 

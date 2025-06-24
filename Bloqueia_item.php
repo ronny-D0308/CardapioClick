@@ -2,6 +2,11 @@
 include 'config.php';
 header('Content-Type: application/json');
 
+// Exibe erros durante desenvolvimento
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 $response = ['bloquear' => false];
 
 // Lê o JSON enviado
@@ -24,18 +29,23 @@ $result1 = $stmt1->get_result();
 if ($row1 = $result1->fetch_assoc()) {
     $idProduto = $row1['etq_Id'];
 
-    // Verifica o estoque no romaneio
-    $sql_romaneio = "SELECT rom_Idproduto, SUM(rom_Quantidade) AS qtd 
-                     FROM romaneio 
-                     WHERE rom_Idproduto = ?
-                     GROUP BY rom_Idproduto";
+    // Busca o status e estoque do produto
+    $sql_romaneio = "SELECT e.etq_Id, e.etq_Ativo, COALESCE(SUM(r.rom_Quantidade), 0) AS qtd
+                     FROM estoque e
+                     LEFT JOIN romaneio r ON e.etq_Id = r.rom_Idproduto
+                     WHERE e.etq_Id = ?
+                     GROUP BY e.etq_Id, e.etq_Ativo";
+
     $stmt2 = $conn->prepare($sql_romaneio);
     $stmt2->bind_param("i", $idProduto);
     $stmt2->execute();
     $result2 = $stmt2->get_result();
 
     if ($row2 = $result2->fetch_assoc()) {
-        if ($row2['qtd'] <= 0) {
+        $ativo = $row2['etq_Ativo'];
+        $quantidade = (int) $row2['qtd'];
+
+        if ($ativo !== 'S' || $quantidade <= 0) {
             $response['bloquear'] = true;
         }
     }
