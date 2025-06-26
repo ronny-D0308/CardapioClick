@@ -18,7 +18,7 @@
 
         // PEGA O VALOR DO SEQUÊNCIA DA VENDA
         $venMesa = intval($_GET['venMesa']);
-        $sql_del = "UPDATE vendas SET ven_Finalizada = 'S' WHERE ven_Mesa = $venMesa AND ven_Finalizada = 'N'";
+        $sql_del = "UPDATE vendas SET ven_Finalizada = 'N' WHERE ven_Mesa = $venMesa AND ven_Finalizada = 'N'";
             //echo $sql_del;
         $query = mysqli_query($conn, $sql_del);
     }
@@ -349,7 +349,7 @@
 
             <!-- Seção de Impressão -->
             <div id="imprimir">
-                <button onclick="imprimirComanda()">IMPRIMIR COMANDA</button>
+                <button onclick="finalizarEImprimir()">IMPRIMIR COMANDA</button>
             </div>
 
             <!-- Estilos para a impressão -->
@@ -423,7 +423,8 @@
                             })
                             .then(() => {
                                 // Após sucesso, chama impressão
-                                imprimir();
+                                //imprimir();
+                                imprimirComanda();
 
                                 if (!sessionStorage.getItem('recarregado')) {
                                     sessionStorage.setItem('recarregado', 'true');
@@ -439,123 +440,140 @@
                     }
                 }
 
-    function imprimir() {
+                function imprimir() {
 
-        if (!linhaSelecionada) {
-            alert("Por favor, selecione uma comanda para imprimir.");
-            return;
-        }
-    
-        const colunas = linhaSelecionada.querySelectorAll("td");
-        const nomeCliente = colunas[0].innerText;
-        const nomeGarcom = colunas[1].innerText;
-        const dataComanda = colunas[2].innerText;
-        const valorComanda = colunas[3].innerText;
+                    if (!linhaSelecionada) {
+                        alert("Por favor, selecione uma comanda para imprimir.");
+                        return;
+                    }
+                
+                    const colunas = linhaSelecionada.querySelectorAll("td");
+                    const nomeCliente = colunas[0].innerText;
+                    const nomeGarcom = colunas[1].innerText;
+                    const dataComanda = colunas[2].innerText;
+                    const valorComanda = colunas[3].innerText;
 
-        //FORMATAR OS ITENS EM TABELA
-        const itensRaw = colunas[4].innerText;
-        let itensComanda;
-        try {
-            itensComanda = JSON.parse(itensRaw);
-        } catch (e) {
-            alert("Erro ao processar itens da comanda.");
-            return;
-        }
-        
-        let tabelaItens = `
-            <table style="width:100%; border-collapse: collapse; text-align:center;">
-                <thead>
-                    <tr>
-                        <th style="border-bottom:1px solid #000; ">Item</th>
-                        <th style="border-bottom:1px solid #000; ">Qtd</th>
-                        <th style="border-bottom:1px solid #000; ">Unit</th>
-                        <th style="border-bottom:1px solid #000; ">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-        
-        itensComanda.forEach(item => {
-            tabelaItens += `
-                <tr>
-                    <td>${item.nome}</td>
-                    <td>${item.quantidade}</td>
-                    <td>R$ ${Number(item.preco_unitario).toFixed(2).replace('.', ',')}</td>
-                    <td>R$ ${Number(item.subtotal).toFixed(2).replace('.', ',')}</td>
-                </tr>`;
-        });
-        
-        tabelaItens += `</tbody></table>`;
-        // FIM DA FORMATAÇÃO DOS ITENS
-    
-        const conteudoImpressao = `
-            <div style="width: 72mm; margin: 0 auto; text-align: center;">
-                <h2>Mais Sabor</h2>
-                <p>Endereço: Rua das Flores, 123</p>
-                <p>Telefone: (11) 1234-5678</p>
-                <hr>
-                <h3>Comanda Fechada</h3>
-                <p><strong>Cliente:</strong> ${nomeCliente}</p>
-                <p><strong>Data:</strong> ${dataComanda}</p>
-                <p><strong>Garçom:</strong> ${nomeGarcom}</p>
-                <p><strong>Valor Total:</strong> R$ ${valorComanda}</p>
-                <h4>Itens:</h4> ${tabelaItens}
-                <hr>
-                <p>Obrigado pela preferência!</p>
-            </div>
-        `;
-    
-        const janelaImpressao = window.open('', '', 'height=400,width=600');
-        janelaImpressao.document.write('<html><head><title>Comanda Fechada</title></head><body>');
-        janelaImpressao.document.write(conteudoImpressao);
-        janelaImpressao.document.write('</body></html>');
-        janelaImpressao.document.close();
-        janelaImpressao.print();
-        janelaImpressao.close();
-    }
+                                //FORMATAR OS ITENS EM TABELA
+                    const itensRaw = colunas[4].innerText;
+                    let itensComanda;
+                    try {
+                        itensComanda = JSON.parse(itensRaw);
+                    } catch (e) {
+                        alert("Erro ao processar itens da comanda.");
+                        return;
+                    }
 
-async function imprimirComanda() {
-  if (!linhaSelecionada) {
-    alert("Por favor, selecione uma comanda para imprimir.");
-    return;
-  }
+                    let tabelaItens = `
+                        <table style="width:100%; border-collapse: collapse; text-align:center;">
+                            <thead>
+                                <tr>
+                                    <th style="border-bottom:1px solid #000; ">Item</th>
+                                    <th style="border-bottom:1px solid #000; ">Qtd</th>
+                                    <th style="border-bottom:1px solid #000; ">Unit</th>
+                                    <th style="border-bottom:1px solid #000; ">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
 
-  const colunas = linhaSelecionada.querySelectorAll("td");
-  const comanda = {
-    mesa: linhaSelecionada.getAttribute('data-id'),
-    cliente: colunas[0].innerText,
-    garcom: colunas[1].innerText,
-    data: colunas[2].innerText,
-    total: colunas[3].innerText.replace('R$', '').trim(),
-    itens: JSON.parse(colunas[4].innerText)
-  };
+                    itensComanda.forEach(item => {
+                        tabelaItens += `
+                            <tr>
+                                <td>${item.nome}</td>
+                                <td>${item.quantidade}</td>
+                                <td>R$ ${Number(item.preco_unitario).toFixed(2).replace('.', ',')}</td>
+                                <td>R$ ${Number(item.subtotal).toFixed(2).replace('.', ',')}</td>
+                            </tr>`;
+                    });
 
-  try {
-    const response = await fetch('http://localhost:3000/imprimir', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(comanda)
-    });
+                    tabelaItens += `</tbody></table>`;
+                    // FIM DA FORMATAÇÃO DOS ITENS
+                
+                    const conteudoImpressao = `
+                        <div style="width: 72mm; margin: 0 auto; text-align: center;">
+                            <h2>Mais Sabor</h2>
+                            <p>Endereço: Rua das Flores, 123</p>
+                            <p>Telefone: (11) 1234-5678</p>
+                            <hr>
+                            <h3>Comanda Fechada</h3>
+                            <p><strong>Cliente:</strong> ${nomeCliente}</p>
+                            <p><strong>Data:</strong> ${dataComanda}</p>
+                            <p><strong>Garçom:</strong> ${nomeGarcom}</p>
+                            <p><strong>Valor Total:</strong> R$ ${valorComanda}</p>
+                            <h4>Itens:</h4> ${tabelaItens}
+                            <hr>
+                            <p>Obrigado pela preferência!</p>
+                        </div>
+                    `;
+                
+                    const janelaImpressao = window.open('', '', 'height=400,width=600');
+                    janelaImpressao.document.write('<html><head><title>Comanda Fechada</title></head><body>');
+                    janelaImpressao.document.write(conteudoImpressao);
+                    janelaImpressao.document.write('</body></html>');
+                    janelaImpressao.document.close();
+                    janelaImpressao.print();
+                    janelaImpressao.close();
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+                    imprimirComanda();
+                }
 
-    const data = await response.json();
-    if (data.success) {
-      alert('Comanda impressa com sucesso!');
-    } else {
-      alert('Erro na impressão: ' + data.error);
-    }
-  } catch (error) {
-    console.error('Erro:', error);
-    alert('Erro ao comunicar com o servidor de impressão: ' + error.message);
-  }
-}
+                async function imprimirComanda() {
+                    try {
+                        // Verifica se o servidor está respondendo
+                        const isServerRunning = await fetch('http://localhost:3000/health', {
+                            method: 'GET',
+                            cache: 'no-store'
+                        }).then(res => res.ok).catch(() => false);
+                    
+                        if (!isServerRunning) {
+                            // Tenta iniciar o servidor
+                            const startResponse = await fetch('http://localhost/start-print-server.php', {
+                                method: 'GET',
+                                cache: 'no-store'
+                            });
+
+                            if (!startResponse.ok) {
+                                throw new Error('Servidor offline - usando impressão alternativa');
+                            }
+
+                            // Aguarda 3 segundos para o servidor iniciar
+                            await new Promise(resolve => setTimeout(resolve, 3000));
+                        }
+                    
+                        // Continua com a impressão normal
+                        const colunas = linhaSelecionada.querySelectorAll("td");
+                        const comanda = {
+                            mesa: linhaSelecionada.getAttribute('data-id'),
+                            cliente: colunas[0].textContent,
+                            garcom: colunas[1].textContent,
+                            data: colunas[2].textContent,
+                            total: colunas[3].textContent.replace('R$', '').trim(),
+                            itens: JSON.parse(colunas[4].textContent)
+                        };
+                    
+                        const printResponse = await fetch('http://localhost:3000/imprimir', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(comanda)
+                        });
+                    
+                        if (!printResponse.ok) {
+                            throw new Error('Falha na impressão');
+                        }
+                    
+                        alert('Comanda impressa com sucesso!');
+                    } catch (error) {
+                        console.error('Erro:', error);
+                        alert('Usando impressão alternativa: ' + error.message);
+                        imprimir(); // Fallback para impressão pelo navegador
+                    }
+                }
             </script>
-
-
+        <?php
+            // start-print-server.php
+            $output = shell_exec('node C:/wamp64/www/CardapioClick/servidor-impressao.js > print-server.log 2>&1 &');
+            //header('Content-Type: application/json');
+            //echo json_encode(['success' => true]);
+        ?>
     </section>
 
 

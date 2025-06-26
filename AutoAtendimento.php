@@ -1,11 +1,11 @@
 <?php
 	session_start();
 
-	if(!isset($_SESSION['usuario'])) {
-		header('Location:Validacao.php');
-		exit;
-	}
-	$usuario = $_SESSION["usuario"];
+	//if(!isset($_SESSION['usuario'])) {
+	//	header('Location:Validacao.php');
+	//	exit;
+	//}
+	//$usuario = $_SESSION["usuario"];
 
 	$comandaId = !empty($_GET['comandaId']) ? $_GET['comandaId'] : '';
 ?>
@@ -218,7 +218,7 @@
 		</div>
 		-->
 
-        <form method="POST" action="processa.php" onsubmit="atualizarHiddenTotal(); getItensSelecionados();">
+        <form method="POST" action="AutoProcessa.php?comandaId=<?= $comandaId ?>" onsubmit="atualizarHiddenTotal(); getItensSelecionados();">
 
         	<!-- INPUT QUE CARREGA OS ITEMS SELECIONADOS -->
         	<input type="hidden" name="itens_selecionados" id="itens_selecionados_input">

@@ -1,0 +1,9 @@
+
+Servidor rodando na porta 3000
+Configuração da impressora: 192.168.0.131:9100
+Timeout: 5000ms
+Ambiente: development
+Rotas disponíveis:
+- POST /imprimir
+- GET /health
+
