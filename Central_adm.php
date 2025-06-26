@@ -349,57 +349,57 @@
 
             <!-- Seção de Impressão -->
             <div id="imprimir">
-                <button onclick="finalizarEImprimir()">IMPRIMIR COMANDA</button>
+                <button onclick="imprimirComanda()">IMPRIMIR COMANDA</button>
             </div>
 
             <!-- Estilos para a impressão -->
-<style>
-@media print {
-  @page {
-    size: 80mm auto;  /* largura da bobina térmica */
-    margin: 0;
-  }
-
-  body {
-    font-family: monospace;
-    font-size: 10px;
-    margin: 0;
-    padding: 0;
-  }
-
-  #imprimir, .menu, .title, h3 {
-    display: none;  /* esconde elementos visuais desnecessários na impressão */
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0 auto;
-    font-size: 10px;
-  }
-
-  th, td {
-    padding: 2px;
-    text-align: left;
-    border-bottom: 1px dashed #000;
-  }
-
-  th {
-    font-weight: bold;
-  }
-
-  h2, h3, h4, p {
-    margin: 4px 0;
-    text-align: center;
-  }
-
-  hr {
-    border: none;
-    border-top: 1px dashed #000;
-    margin: 5px 0;
-  }
-}
-</style>
+            <style>
+                @media print {
+                    @page {
+                      size: 80mm auto;  /* largura da bobina térmica */
+                      margin: 0;
+                    }
+                
+                            body {
+                      font-family: monospace;
+                      font-size: 10px;
+                      margin: 0;
+                      padding: 0;
+                    }
+                
+                            #imprimir, .menu, .title, h3 {
+                      display: none;  /* esconde elementos visuais desnecessários na impressão */
+                    }
+                
+                            table {
+                      width: 100%;
+                      border-collapse: collapse;
+                      margin: 0 auto;
+                      font-size: 10px;
+                    }
+                
+                            th, td {
+                      padding: 2px;
+                      text-align: left;
+                      border-bottom: 1px dashed #000;
+                    }
+                
+                            th {
+                      font-weight: bold;
+                    }
+                
+                            h2, h3, h4, p {
+                      margin: 4px 0;
+                      text-align: center;
+                    }
+                
+                            hr {
+                      border: none;
+                      border-top: 1px dashed #000;
+                      margin: 5px 0;
+                    }
+                }
+            </style>
 
 
             <!-- FUNÇÃO DE IMPRESSÃO -->
@@ -513,49 +513,46 @@
         janelaImpressao.close();
     }
 
-//qz.websocket.connect().then(() => {
-//  console.log("✅ Conectado ao QZ Tray");
-//  return qz.printers.find();
-//}).then(printers => {
-//  console.log("🖨️ Impressoras disponíveis:", printers);
-//}).catch(err => {
-//  console.error("❌ Erro ao conectar:", err);
-//});
-//
-//
-//function imprimir() {
-//    if (!linhaSelecionada) {
-//        alert("Por favor, selecione uma comanda para imprimir.");
-//        return;
-//    }
-//
-//    const colunas = linhaSelecionada.querySelectorAll("td");
-//    const nomeCliente = colunas[0].innerText;
-//    const nomeGarcom = colunas[1].innerText;
-//    const valorComanda = colunas[2].innerText;
-//
-//    const texto = `
-//        Comanda Fechada - Mais Sabor
-//        Cliente: ${nomeCliente}
-//        Garçom: ${nomeGarcom}
-//        Total: R$ ${valorComanda}
-//
-//        Obrigado pela preferência!
-//    `;
-//
-//    qz.websocket.connect().then(() => {
-//        return qz.printers.find("Brother DCP-L5652DN Printer"); // ou a EPSON, se preferir
-//    }).then(printer => {
-//        const config = qz.configs.create(printer);
-//        const data = [{ type: 'raw', format: 'plain', data: texto }];
-//        return qz.print(config, data);
-//    }).then(() => {
-//        console.log("Impressão enviada.");
-//    }).catch(err => {
-//        console.error("Erro ao imprimir:", err);
-//    });
-//}
+async function imprimirComanda() {
+  if (!linhaSelecionada) {
+    alert("Por favor, selecione uma comanda para imprimir.");
+    return;
+  }
 
+  const colunas = linhaSelecionada.querySelectorAll("td");
+  const comanda = {
+    mesa: linhaSelecionada.getAttribute('data-id'),
+    cliente: colunas[0].innerText,
+    garcom: colunas[1].innerText,
+    data: colunas[2].innerText,
+    total: colunas[3].innerText.replace('R$', '').trim(),
+    itens: JSON.parse(colunas[4].innerText)
+  };
+
+  try {
+    const response = await fetch('http://localhost:3000/imprimir', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(comanda)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    if (data.success) {
+      alert('Comanda impressa com sucesso!');
+    } else {
+      alert('Erro na impressão: ' + data.error);
+    }
+  } catch (error) {
+    console.error('Erro:', error);
+    alert('Erro ao comunicar com o servidor de impressão: ' + error.message);
+  }
+}
             </script>
 
 
