@@ -74,20 +74,20 @@ app.post('/imprimir', async (req, res) => {
                     .encode('CP860') // Codificação para caracteres em português
                     .align('ct')     // Centralizar
                     .style('b')      // Negrito
-                    .size(3, 3)      // Tamanho maior para o título (simulando h2/h3)
+                    .size(1, 1)      // Tamanho maior para o título (simulando h2/h3)
                     .text('MAIS SABOR')
                     .text('')        // Linha em branco para espaçamento
-                    .size(1, 1)      // Retorna ao tamanho normal de fonte (simulando 10px)
+                    //.size(1, 1)      // Retorna ao tamanho normal de fonte (simulando 10px)
                     .style('normal'); // Retorna ao estilo normal (sem negrito)
                 
-                dashedLine(); // Simula <hr> ou border-top
+                //dashedLine(); // Simula <hr> ou border-top
                 
                 printer
                     .encode('CP860') // Codificação para caracteres em português
                     .align('lt')     // Alinhar à esquerda para os detalhes
                     .text(`Mesa: ${mesa || 'N/A'}`)
                     .text(`Cliente: ${cliente || 'N/A'}`)
-                    .text(`Garçom: ${garcom || 'N/A'}`)
+                    .text(`Garcom: ${garcom || 'N/A'}`)
                     .text(`Data: ${data || new Date().toLocaleDateString('pt-BR')}`); // Formato de data PT-BR
                 
                 dashedLine(); // Simula <hr> ou border-bottom de cabeçalho
@@ -112,7 +112,7 @@ app.post('/imprimir', async (req, res) => {
                     const preco = `R$ ${Number(item.preco_unitario || 0).toFixed(2)}`.padEnd(12); // Preenche para 12 chars
 
                     printer
-                        .align('ct')     // Centralizar
+                        .align('lt')     // Centralizar
                         .text(nome + quantidade + preco);
                 });
 
@@ -122,8 +122,7 @@ app.post('/imprimir', async (req, res) => {
                     .align('rt')    // Alinhar à direita para o total
                     .style('b')     // Negrito para o total
                     .size(1, 2)     // Ligeiramente maior para o total
-                    .text(`TOTALit: R$ ${Number(total || 0).toFixed(2)}`)
-                    .size(1, 1)     // Volta ao tamanho normal
+                    .text(`TOTAL: R$ ${totalValue}`)
                     .style('normal') // Volta ao estilo normal
                     .align('ct')     // Centralizar
                     .size(1, 1)      // Tamanho normal

@@ -1,6 +1,6 @@
 <?php
-    error_reporting(0);       // Desativa todos os relatórios de erro
-    ini_set('display_errors', 0);  // Garante que os erros não sejam exibidos na tela
+    //error_reporting(0);       // Desativa todos os relatórios de erro
+    //ini_set('display_errors', 0);  // Garante que os erros não sejam exibidos na tela
 
     include('config.php');
 	session_start();
@@ -8,19 +8,29 @@
 	if(!isset($_SESSION['usuario'])) {
 		header('Location:Validacao.php');
 		exit;
-	}
-
-	$usuario = $_SESSION["usuario"];
+    }
 
     $flag = isset($_GET['flag']) ? $_GET['flag'] : '';
 
-    if($flag == 'pagar') {
-
-        // PEGA O VALOR DO SEQUÊNCIA DA VENDA
+    if ($flag == 'pagar') {
+        // PEGA O VALOR DA MESA E FORMA DE PAGAMENTO
         $venMesa = intval($_GET['venMesa']);
-        $sql_del = "UPDATE vendas SET ven_Finalizada = 'N' WHERE ven_Mesa = $venMesa AND ven_Finalizada = 'N'";
-            //echo $sql_del;
-        $query = mysqli_query($conn, $sql_del);
+        $formaPag = isset($_GET['formapag']) ? htmlspecialchars(trim($_GET['formapag'])) : ''; // Sanitiza a entrada
+
+        // ATUALIZA A VENDA COM A FORMA DE PAGAMENTO E FINALIZA
+        $sql_del = "UPDATE vendas SET ven_Finalizada = 'S', ven_Formapag = ? WHERE ven_Mesa = ? AND ven_Finalizada = 'N'";
+        $stmt = $conn->prepare($sql_del);
+        $stmt->bind_param("si", $formaPag, $venMesa);
+        $stmt->execute();
+        $stmt->close();
+
+        // Resposta para o fetch (opcional)
+        if ($stmt->affected_rows > 0) {
+            echo "Comanda finalizada com sucesso!";
+        } else {
+            http_response_code(500);
+            echo "Erro ao finalizar comanda ou comanda já finalizada.";
+        }
     }
 ?>
 
@@ -30,6 +40,10 @@
     <meta charset="UTF-8">
     <link rel="icon" href="Cardapioclick.ico" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>jQuery.noConflict();</script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-core.min.js" type="text/javascript"></script>
+    <script src="https://cdn.anychart.com/releases/v8/js/anychart-pie.min.js" type="text/javascript"></script>
     <script src="JS_Centraladm/js_modal.js"> </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>.: Central :.</title>
@@ -96,13 +110,18 @@
             margin: 0 auto;
         }
         .sessão{
-            margin-bottom:300px;
+            margin-bottom:200px;
         }
         #imprimir{
             text-align:center;
             margin:auto 0;
             margin-top:30px;
+        }
+        #imprimir button {
+            width: 180px;
+            height: 30px;
             cursor: pointer;
+            border-radius: 10px;
         }
         .butoes{
             text-align:center;
@@ -227,7 +246,59 @@
                 top:0;
             }
         }
-        
+
+        /*------ STYLE PARA A ANÁLISE DE VENDAS -------*/
+        .container-tabela {
+            margin: 0 auto;
+            width: 80%;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 0px 10px;
+            padding: 10px;
+        }
+        .filtros {
+            display: flex; 
+            flex-direction: row;
+            justify-content: center;
+            gap: 0px 20px;
+            align-items: center;
+            width: 100%;
+            margin: 10px 0px;
+            color: white;
+        }
+        .filtros input {
+            width: 150px;
+            height: 30px;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+        .Card {
+            width: auto;
+            height: 70px;
+            font-size: 25px;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 5px;
+        }
+        p {
+            font-size: 12px;
+        }
+
+        /*----- ESTILO DOS BOTÕES DE FORMA DE PAGAMENTO ----*/
+            .botoesformapag {
+                background-color: #da6c22;
+                color: white; 
+                font-size: 15px;
+                margin: 5px;
+            }
     </style>
 
 </head>
@@ -251,7 +322,7 @@
 
 <body>
 
-<!--LOCAL DE BUSCA DE INFOMAÇÕES DOS CLIENTES-->
+    <!--LOCAL DE BUSCA DE INFOMAÇÕES DOS CLIENTES-->
 
     <section class="sessão">
             <div class="container">
@@ -371,7 +442,7 @@
                       display: none;  /* esconde elementos visuais desnecessários na impressão */
                     }
                 
-                            table {
+                    table {
                       width: 100%;
                       border-collapse: collapse;
                       margin: 0 auto;
@@ -411,33 +482,89 @@
                     }
                 
                     const venMesa = linhaSelecionada.getAttribute("data-id");
-                
                     if (confirm("Deseja realmente finalizar e imprimir esta comanda?")) {
-                        // Usa fetch para fazer a finalização em background, sem redirecionar
-                        fetch(`Central_adm.php?flag=pagar&venMesa=${venMesa}`)
-                            .then(response => {
-                                if (!response.ok) {
-                                    throw new Error("Erro ao finalizar a comanda.");
-                                }
-                                return response.text();
-                            })
-                            .then(() => {
-                                // Após sucesso, chama impressão
-                                //imprimir();
-                                imprimirComanda();
 
-                                if (!sessionStorage.getItem('recarregado')) {
-                                    sessionStorage.setItem('recarregado', 'true');
-                                    window.location.reload();
-                                } else {
-                                    sessionStorage.removeItem('recarregado');
-                                }
-                            })
-                            .catch(error => {
-                                console.error(error);
-                                alert("Erro ao finalizar comanda.");
-                            });
+                    // Cria o overlay
+                    const overlay = document.createElement('div');
+                    overlay.style.position = 'fixed';
+                    overlay.style.top = '0';
+                    overlay.style.left = '0';
+                    overlay.style.width = '100%';
+                    overlay.style.height = '100%';
+                    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                    overlay.style.zIndex = '999'; // Abaixo do modal, acima do resto da página
+                    document.body.appendChild(overlay);
+
+                        // Cria um modal simples com select para forma de pagamento
+                    const modal = document.createElement('div');
+                    modal.style.position = 'fixed';
+                    modal.style.top = '50%';
+                    modal.style.left = '50%';
+                    modal.style.transform = 'translate(-50%, -50%)';
+                    modal.style.backgroundColor = 'white';
+                    modal.style.padding = '20px';
+                    modal.style.border = '1px solid #ccc';
+                    modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+                    modal.style.zIndex = '1000';
+                    modal.style.display = 'flex';
+                    modal.style.flexDirection = 'column'; // Organiza os itens em coluna
+                    modal.style.justifyContent = 'center'; // Centraliza horizontalmente os itens internos
+                    modal.style.alignItems = 'center'; // Corrige o erro de digitação, centraliza verticalmente os itens internos
+                    modal.style.width = '300px'; // Define uma largura fixa para consistência
+                    modal.style.height = '250px';
+                    modal.style.borderRadius = '8px'; // Opcional: bordas arredondadas para melhor estética
+                    modal.innerHTML = `
+                        <h4 style='color:black;'>Selecione a Forma de Pagamento</h4>
+                        <select id="formaPagamento">
+                            <option value="">Selecione...</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="PIX">PIX</option>
+                        </select>
+                        <br><br>
+                        <button class='botoesformapag' onclick="confirmarPagamento()">Confirmar</button>
+                        <button class='botoesformapag' onclick="cancelarPagamento()">Cancelar</button>
+                    `;
+                    document.body.appendChild(modal);
+
+                    // Funções globais para confirmar ou cancelar (devem ser acessíveis no escopo da página)
+                    window.confirmarPagamento = function() {
+                        const formaPag = document.getElementById('formaPagamento').value;
+                        if (formaPag) {
+                            fetch(`Central_adm.php?flag=pagar&venMesa=${venMesa}&formapag=${encodeURIComponent(formaPag)}`)
+                                .then(response => {
+                                    if (!response.ok) {
+                                        throw new Error("Erro ao finalizar a comanda.");
+                                    }
+                                    return response.text();
+                                })
+                                .then(() => {
+                                    imprimirComanda();
+                                    if (!sessionStorage.getItem('recarregado')) {
+                                        sessionStorage.setItem('recarregado', 'true');
+                                        window.location.reload();
+                                    } else {
+                                        sessionStorage.removeItem('recarregado');
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error(error);
+                                    alert("Erro ao finalizar comanda.");
+                                });
+                            document.body.removeChild(modal);
+                        } else {
+                            alert("Por favor, selecione uma forma de pagamento.");
+                        }
+                    };
+
+                    window.cancelarPagamento = function() {
+                        document.body.removeChild(modal);
+                        alert("Operação cancelada.");
+                        window.location.reload();
+                    };
                     }
+
                 }
 
                 function imprimir() {
@@ -578,58 +705,217 @@
 
 
 
-    <!-------------------------------------------------- LOCAL DE BUSCA DE COMANDAS PENDENTES  ------------------------------------------------------------>
-    <!--
+    <!-------------------------------------------------- LOCAL DE ANÁLISE DE VENDAS  ------------------------------------------------------------>
     <section class="sessão">
-        <h1 class="title">Comandas pendentes</h1>
-               
-                ?php
-                    $sql_pen = "SELECT comp_Id, comp_Cliente, comp_Garcom, comp_Valor, comp_Data FROM comandaspendentes";
-                    $result_pen = $conn->query($sql_pen); 
+        <h1 class="title"> Análise de vendas </h1>
+        
+        <div class="filtros">
+            <span>
+                <label> De: </label>
+                <input type="date" name="dataini" id="dataini">
+                <label> até: </label>
+                <input type="date" name="datafim" id="datafim">
+            </span>
+            <select name="formapag" id="formapag">
+                <option value="Todos">Todos</option>
+                <option value="Cartao">Cartão</option>
+                <option value="Pix">Pix</option>
+                <option value="Dinheiro">Dinheiro</option>
+            </select>
+
+            <select name="produtos" id="produtos">
+                <?php
+                    $sql_prods = "SELECT etq_Nome, etq_Id FROM estoque WHERE etq_Ativo <> 'N'";
+                    $query_prods = mysqli_query($conn, $sql_prods);
+                    if (mysqli_num_rows($query_prods) > 0) {
+                        echo "<option value='Todos'> Todos </option>";
+                        while ($linhas = mysqli_fetch_object($query_prods)) {
+                            echo "<option value='". $linhas->etq_Id ."'> ". $linhas->etq_Nome ."</option>";
+                        }
+                    } else {
+                        echo "<option value=''> Nenhum item ativo </option>";
+                    }
                 ?>
+            </select>
+
+        </div>
 
             <div class="container-tabela">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th class="coluna" >Nome</th>
-                            <th class="coluna" >Garçon</th>
-                            <th class="coluna" >Data</th>
-                            <th class="coluna" >Valor</th>
-                            <th class="coluna" style="display:none;" >Id</th>
-                            !-- <th class="coluna" >...</th> --
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ?php
-                            if ($result_pen === false) {
-                                echo "Erro na consulta SQL: " . $conn->error;
-                            } else {
-                                 if($result_pen->num_rows > 0) {
-                                     while($row = $result_pen->fetch_assoc()) {
-                                         echo "<tr>";
-                                         echo "<td>".$row['comp_Cliente']."</td>";
-                                         echo "<td>".$row['comp_Garcom']."</td>";
-                                         echo "<td>".$row['comp_Data']."</td>";
-                                         echo "<td>". number_format($row['comp_Valor'], 2,',','.') ."</td>";
-                                         echo "<td style='display:none;'>".$row['comp_Id']."</td>";
-                                         echo "<td>
-                                             <a class='acoes' id='Deletar' href='delete.php?compId=$row[comp_Id]' title='Deletar'>
-                                                <img src='imagens/remove.png' width='20px'> </a>
-                                             !-- <a class='acoes' id='Editar' href='edit.php?compId=$row[comp_Id]' title='Editar'> EDITAR </a>--
-                                         </td>";
 
-                                         }
-                                 } else {
-                                         echo "<tr c><td> 0 resultados </td></tr>";
-                                 }
-                            }
-                        ?>
-                    </tbody>
-                </table>
+                <!-- CARTÕES E GRÁFICO DE COLUNAS -->
+                <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 850px; gap: 10px;">
+                    <!--CARD FATURAMENTO TOTAL -->
+                    <div class="Card">
+                    <?php
+                        $sql_BI = "SELECT SUM(ven_Valor) AS Faturamento FROM vendas";
+                        $result_BI = $conn->query($sql_BI); 
+                        $linhas = mysqli_fetch_object($result_BI);
+                        echo "Faturamento R$ ". number_format($linhas->Faturamento ,'2',',','.');
+                    ?>
+                    </div>
+
+                    <!--CARD TICKET MÉDIO -->
+                    <div class="Card">
+                    <?php
+                        $sql_BI_tk = "SELECT COUNT(ven_Mesa) AS Mesas FROM vendas";
+                        $result_BI_tk = $conn->query($sql_BI_tk); 
+                        $linhas_tk = mysqli_fetch_object($result_BI_tk);
+                        $ticket = $linhas->Faturamento / $linhas_tk->Mesas;
+                        echo "Ticket Médio ". number_format($ticket, 2, ',', '.');
+                    ?>
+                    </div>
+
+                    <!--CARD CUSTOS -->
+                    <div class="Card" style="width: 280px;">
+                    <?php
+                        $sql_BI_Des = "SELECT 
+                                    (SELECT SUM(ven_Valor) FROM vendas) AS Faturamento,
+                                    (SELECT SUM(rom_Preco) FROM romaneio) AS Despesas";
+                        $result_BI_Des = $conn->query($sql_BI_Des); 
+                        $linhas_Des = mysqli_fetch_object($result_BI_Des);
+                        $Custo = $linhas_Des->Faturamento - $linhas_Des->Despesas;
+                        echo "Lucro Bruto R$ ". number_format($Custo ,'2',',','.');
+                        echo "<p> Receita - custos </p>"; 
+                    ?>
+                    </div>
+
+                    <div class="Card" id="container2" style="width: 900px; height: 325px; border-radius: 10px;"></div>
+                    
+                    <?php
+                        // Faturamento por mês
+                        $faturamentos = [];
+                        $sql_faturamento = "SELECT DATE_FORMAT(ven_Data, '%Y-%m') AS Mes, SUM(ven_Valor) AS Faturamento 
+                                            FROM vendas GROUP BY Mes ORDER BY Mes";
+                        $query_faturamento = mysqli_query($conn, $sql_faturamento);
+                        while($row = mysqli_fetch_assoc($query_faturamento)){
+                            $faturamentos[$row['Mes']] = floatval($row['Faturamento']);
+                        }
+                        
+                        // Despesas por mês
+                        $despesas = [];
+                        $sql_despesas = "SELECT DATE_FORMAT(rom_Dataentrada, '%Y-%m') AS Mes, SUM(rom_Preco) AS Despesas 
+                                         FROM romaneio GROUP BY Mes ORDER BY Mes";
+                        $query_despesas = mysqli_query($conn, $sql_despesas);
+                        while($row = mysqli_fetch_assoc($query_despesas)){
+                            $despesas[$row['Mes']] = floatval($row['Despesas']);
+                        }
+                        
+                        // Juntar meses dos dois arrays:
+                        $meses = array_unique(array_merge(array_keys($faturamentos), array_keys($despesas)));
+                        sort($meses);
+                        
+                        $meses_nomes = [
+                            '01' => 'Janeiro',
+                            '02' => 'Fevereiro',
+                            '03' => 'Março',
+                            '04' => 'Abril',
+                            '05' => 'Maio',
+                            '06' => 'Junho',
+                            '07' => 'Julho',
+                            '08' => 'Agosto',
+                            '09' => 'Setembro',
+                            '10' => 'Outubro',
+                            '11' => 'Novembro',
+                            '12' => 'Dezembro'
+                        ];
+
+                        $valores = [];
+                        foreach($meses as $mes){
+                            $ano = substr($mes, 0, 4);
+                            $num_mes = substr($mes, 5, 2);
+                            $mes_nome = $meses_nomes[$num_mes] . '/' . $ano;
+                            $valores[] = [
+                                'Mes' => $mes_nome,
+                                'Faturamento' => isset($faturamentos[$mes]) ? $faturamentos[$mes] : 0,
+                                'Despesas' => isset($despesas[$mes]) ? $despesas[$mes] : 0
+                            ];
+                        }
+                        $json_bi_periodo = json_encode($valores);
+                    ?>
+
+
+                    <script>
+                        anychart.onDocumentReady(function () {
+                            var phpData = <?php echo $json_bi_periodo; ?>;
+                    
+                            // Formato: [Mês, Faturamento, Despesas]
+                            var dataSet = anychart.data.set(
+                                phpData.map(r => [r.Mes, r.Faturamento, r.Despesas])
+                            );
+                    
+                            var faturamentoSeries = dataSet.mapAs({ x: 0, value: 1 });
+                            var despesasSeries = dataSet.mapAs({ x: 0, value: 2 });
+                    
+                            var chart = anychart.column();
+                            chart.animation(true);
+                            chart.title('Faturamento e Despesas por Mês');
+                    
+                            var s1 = chart.column(faturamentoSeries);
+                            s1.name('Faturamento').fill('#4caf50').stroke('#388e3c');
+                    
+                            var s2 = chart.column(despesasSeries);
+                            s2.name('Despesas').fill('#e53935').stroke('#b71c1c');
+                    
+                            chart.yAxis().labels().format('R$ {%Value}{groupsSeparator: }');
+                            chart.yAxis().title('Valores (R$)');
+                            chart.xAxis().title('Mês');
+                            chart.xAxis().labels().rotation(-45);
+                    
+                            chart.legend().enabled(true).fontSize(13).padding([0,0,20,0]);
+                            chart.interactivity().hoverMode('single');
+                            chart.tooltip().format('R$ {%Value}{groupsSeparator: }');
+                            chart.container('container2');
+                            chart.draw();
+                        });
+                    </script>
+                </div>
+
+                <!-- CARD GRÁFICO DE FORMAS DE PAGAMENTO -->
+                <div class="Card" id="container" style="width: 400px; height: auto; border-radius: 10px;">
+                    <?php
+                    // Consulta SQL ajustada para agrupar por forma de pagamento
+                    $sql_BI_Fp = "SELECT SUM(ven_Valor) AS Faturamento, ven_Formapag FROM vendas WHERE ven_Finalizada = 'S' GROUP BY ven_Formapag";
+                    $result_BI_Fp = $conn->query($sql_BI_Fp);
+
+                    // Array para armazenar os dados de formas de pagamento
+                    $formasPagamento = [];
+                    while ($row = mysqli_fetch_assoc($result_BI_Fp)) {
+                        $forma = $row['ven_Formapag'] ? htmlspecialchars($row['ven_Formapag']) : 'Não Informado';
+                        $faturamento = floatval($row['Faturamento']);
+                        $formasPagamento[] = [$forma, $faturamento];
+                    }
+                    // Se não houver dados, definir um array padrão para evitar erros no gráfico
+                    if (empty($formasPagamento)) {
+                        $formasPagamento = [
+                            ['Cartão de Débito', 0],
+                            ['Cartão de Crédito', 0],
+                            ['Pix', 0],
+                            ['Dinheiro', 0]
+                        ];
+                    }
+                    ?>
+                    
+
+                    <script>
+                        anychart.onDocumentReady(function () {
+                            // Cria uma instância de um gráfico de pizza
+                            var chart = anychart.pie();
+                            // Define os dados dinamicamente a partir do PHP
+                            chart.data(<?php echo json_encode($formasPagamento); ?>);
+                            // Define o título do gráfico
+                            chart.title("Formas de Pagamento");
+                            // Define o container do gráfico
+                            chart.container("container");
+                            const container = document.getElementById("container");
+                            container.style.borderRadius = '5px';
+                            // Inicia a exibição do gráfico
+                            chart.draw();
+                        });
+                    </script>
+                </div>
+
             </div>
-
-    </section> -->
+    </section>
     
 
     <!--------------------------------------------------- LOCAL DO GRÁFICO DE ATUALIDADES DA EMPRESA ------------------------------------------------------------>
@@ -661,111 +947,109 @@
         <div id="container" style="width:100%; height:600px;"></div> <!-- Área do gráfico -->
 
         <?php
-        $labels = [];
-        $dados = [];
+            $labels = [];
+            $dados = [];
 
-        if (isset($_POST['ConsultaGarcom'])) {
-            // include 'conexao.php';
-            $nomeBusca = $_POST['nomeBusca'];
-            $tipoBusca = $_POST['tipoBusca'];
-            $dataInicio = $_POST['dataInicio'];
-            $dataFinal = $_POST['dataFinal'];
+            if (isset($_POST['ConsultaGarcom'])) {
+                // include 'conexao.php';
+                $nomeBusca = $_POST['nomeBusca'];
+                $tipoBusca = $_POST['tipoBusca'];
+                $dataInicio = $_POST['dataInicio'];
+                $dataFinal = $_POST['dataFinal'];
 
-            if ($tipoBusca == "por-mesa") {
-                $sql = "SELECT ven_Data, COUNT(DISTINCT CONCAT(ven_Data, '-', ven_Mesa)) AS total_mesas 
-                        FROM vendas 
-                        WHERE ven_Garcom = '$nomeBusca'  
-                              AND ven_Data BETWEEN '$dataInicio' AND '$dataFinal' 
-                        GROUP BY ven_Data
-                        ORDER BY ven_Data ASC";
-            } elseif ($tipoBusca == "por-valor") {
-                $sql = "SELECT ven_Data, ven_Garcom, SUM(ven_Valor) AS total_valor 
-                        FROM vendas 
-                        WHERE ven_Garcom = '$nomeBusca' 
-                              AND ven_Data BETWEEN '$dataInicio' AND '$dataFinal'
-                        GROUP BY ven_Data
-                        ORDER BY ven_Data ASC";
-            } elseif ($tipoBusca == "ticket") {
-                $sql = "SELECT ven_Data, ven_Garcom, COUNT(DISTINCT ven_Mesa) AS total_mesas, SUM(ven_Valor) AS total_venda 
-                        FROM vendas 
-                        WHERE ven_Garcom = '$nomeBusca' 
-                              AND ven_Data BETWEEN '$dataInicio' AND '$dataFinal' 
-                        GROUP BY ven_Data
-                        ORDER BY ven_Data ASC";
-            }
-                //echo $sql;
-            $result = $conn->query($sql);
-            if ($result && $result->num_rows > 0) {
-                if ($tipoBusca == "por-mesa") {
-                    $totalMesas = 0;
-                    while ($row = $result->fetch_assoc()) {
-                        $totalMesas += (int)$row['total_mesas'];
-                    }
-                    echo "<h2 style='text-align:center; color:white;'>Total de mesas atendidas: <strong>$totalMesas</strong></h2>";
-                } else {
-                    while ($row = $result->fetch_assoc()) {
-                        if ($tipoBusca == "ticket") {
-                            $labels[] = date('m/Y', strtotime($row['ven_Data']));
-                            $dados[] = round($row['total_venda'] / max($row['total_mesas'], 1), 2);
-                        } elseif ($tipoBusca == "por-valor") {
-                            
-                            $labels[] = date('d/m/Y', strtotime($row['ven_Data']));
-                            $dados[] = (float) $row['total_valor'];
+                    if ($tipoBusca == "por-mesa") {
+                    $sql = "SELECT ven_Data, COUNT(DISTINCT CONCAT(ven_Data, '-', ven_Mesa)) AS total_mesas 
+                            FROM vendas 
+                            WHERE ven_Garcom = '$nomeBusca'  
+                                  AND ven_Data BETWEEN '$dataInicio' AND '$dataFinal' 
+                            GROUP BY ven_Data
+                            ORDER BY ven_Data ASC";
+                } elseif ($tipoBusca == "por-valor") {
+                    $sql = "SELECT ven_Data, ven_Garcom, SUM(ven_Valor) AS total_valor 
+                            FROM vendas 
+                            WHERE ven_Garcom = '$nomeBusca' 
+                                  AND ven_Data BETWEEN '$dataInicio' AND '$dataFinal'
+                            GROUP BY ven_Data
+                            ORDER BY ven_Data ASC";
+                } elseif ($tipoBusca == "ticket") {
+                    $sql = "SELECT ven_Data, ven_Garcom, COUNT(DISTINCT ven_Mesa) AS total_mesas, SUM(ven_Valor) AS total_venda 
+                            FROM vendas 
+                            WHERE ven_Garcom = '$nomeBusca' 
+                                  AND ven_Data BETWEEN '$dataInicio' AND '$dataFinal' 
+                            GROUP BY ven_Data
+                            ORDER BY ven_Data ASC";
+                }
+                    //echo $sql;
+                $result = $conn->query($sql);
+                if ($result && $result->num_rows > 0) {
+                    if ($tipoBusca == "por-mesa") {
+                        $totalMesas = 0;
+                        while ($row = $result->fetch_assoc()) {
+                            $totalMesas += (int)$row['total_mesas'];
+                        }
+                        echo "<h2 style='text-align:center; color:white;'>Total de mesas atendidas: <strong>$totalMesas</strong></h2>";
+                    } else {
+                        while ($row = $result->fetch_assoc()) {
+                            if ($tipoBusca == "ticket") {
+                                $labels[] = date('m/Y', strtotime($row['ven_Data']));
+                                $dados[] = round($row['total_venda'] / max($row['total_mesas'], 1), 2);
+                            } elseif ($tipoBusca == "por-valor") {
+
+                                $labels[] = date('d/m/Y', strtotime($row['ven_Data']));
+                                $dados[] = (float) $row['total_valor'];
+                            }
                         }
                     }
+                } else {
+                    echo "<p style='text-align:center; color:red;'>Nenhum resultado encontrado.</p>";
                 }
-            } else {
-                echo "<p style='text-align:center; color:red;'>Nenhum resultado encontrado.</p>";
+
+                $conn->close();
             }
+            ?>
 
-            $conn->close();
-        }
-        ?>
+            <!-- AnyChart 3D -->
+            <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+            <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
 
-        <!-- AnyChart 3D -->
-        <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
-        <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
+            <?php if ($tipoBusca !== "por-mesa") : ?>
+                <script>
+                    const labels = <?php echo json_encode($labels); ?>;
+                    const dados = <?php echo json_encode($dados); ?>;
+                    const tipoBusca = "<?php echo $tipoBusca ?? ''; ?>";
 
-        <?php if ($tipoBusca !== "por-mesa") : ?>
-            <script>
-            const labels = <?php echo json_encode($labels); ?>;
-            const dados = <?php echo json_encode($dados); ?>;
-            const tipoBusca = "<?php echo $tipoBusca ?? ''; ?>";
+                        let titulo = "Resultado";
+                    if (tipoBusca === "por-mesa") titulo = "Mesas Atendidas por Garçom";
+                    else if (tipoBusca === "por-valor") titulo = "Valor Vendido por Garçom";
+                    else if (tipoBusca === "ticket") titulo = "Ticket Médio por Garçom";
 
-            let titulo = "Resultado";
-            if (tipoBusca === "por-mesa") titulo = "Mesas Atendidas por Garçom";
-            else if (tipoBusca === "por-valor") titulo = "Valor Vendido por Garçom";
-            else if (tipoBusca === "ticket") titulo = "Ticket Médio por Garçom";
+                        if (labels.length > 0 && dados.length > 0) {
+                        anychart.onDocumentReady(function () {
+                            let chart = anychart.column3d();
+                            chart.animation(true);
+                            chart.title(titulo);
 
-            if (labels.length > 0 && dados.length > 0) {
-                anychart.onDocumentReady(function () {
-                    let chart = anychart.column3d();
-                    chart.animation(true);
-                    chart.title(titulo);
+                                let data = labels.map((label, index) => [label, dados[index]]);
+                            chart.column(data);
 
-                    let data = labels.map((label, index) => [label, dados[index]]);
-                    chart.column(data);
+                                chart.tooltip()
+                                .position("center-top")
+                                .anchor("center-bottom")
+                                .offsetX(0)
+                                .offsetY(5)
+                                .format('${%Value}');
 
-                    chart.tooltip()
-                        .position("center-top")
-                        .anchor("center-bottom")
-                        .offsetX(0)
-                        .offsetY(5)
-                        .format('${%Value}');
+                                chart.yScale().minimum(0);
+                            chart.yAxis().labels().format('{%Value}{groupsSeparator: }');
+                            chart.xAxis().title("Data");
+                            chart.yAxis().title("Valor");
 
-                    chart.yScale().minimum(0);
-                    chart.yAxis().labels().format('{%Value}{groupsSeparator: }');
-                    chart.xAxis().title("Data");
-                    chart.yAxis().title("Valor");
-
-                    chart.container('container');
-                    chart.draw();
-                });
-            }
-            </script>
-        <?php endif; ?>
-
+                                chart.container('container');
+                            chart.draw();
+                        });
+                    }
+                </script>
+            <?php endif; ?>
     </section>
-
 </body>
 </html>

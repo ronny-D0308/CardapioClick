@@ -6,6 +6,7 @@ $response = [];
 
 // Obtém o venSeq e valida
 $venMesa = isset($_GET['venMesa']) ? (int)$_GET['venMesa'] : 0;
+$formapag = isset($_GET['formapag']) ? $_GET['formapag'] : '';
 $itens = json_decode(file_get_contents('php://input'), true)['itens'] ?? [];
 
 if (!$venMesa) {
@@ -45,7 +46,7 @@ if ($stmt->num_rows === 0) {
 $stmt->close();
 
 // Atualiza a venda como finalizada
-$sql_upd = "UPDATE vendas SET ven_Finalizada = 'S' WHERE ven_Mesa = ?";
+$sql_upd = "UPDATE vendas SET ven_Finalizada = 'S', ven_Formapag = '$formapag' WHERE ven_Mesa = ? AND ven_Finalizada <> 'S'";
 $stmt_upd = $conn->prepare($sql_upd);
 if (!$stmt_upd) {
     $response['erro'] = 'Erro ao preparar UPDATE: ' . $conn->error;

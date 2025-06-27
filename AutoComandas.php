@@ -6,7 +6,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sua Comanda</title>
+    <title> Sua Comanda </title>
     <style>
         body {
             font-family: sans-serif;
@@ -49,11 +49,27 @@
             color: #888;
             padding: 20px;
         }
+
+        /*------ STYLE DA DIV AUTO ATENDIMENTO ------*/
+            .divAuto {
+                margin: 10px;
+                width: 100%;
+                text-align: center;
+            }
+            .divAuto button {
+                font-size: 15px;
+                font-weight: bold;
+                width: 150px;
+                height: 30px; 
+                border-radius: 10px;
+                border: none;
+                background-color: #0096e5;
+            }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bem-vindo ao Autoatendimento</h1>
+        <h1>Bem-vindo ao Auto atendimento</h1>
         <input type="hidden" id="comandaId" value="<?= $comandaId ?>">
         <div id="modalContent"></div>
         <div id="totalValue" class="total"></div>
@@ -75,6 +91,7 @@
                     return response.json();
                 })
                 .then(data => {
+                    itensDaComandaAtual = data.itens; 
                     let totalComanda = 0;
                     modalContent.innerHTML = '';
 
@@ -146,6 +163,59 @@
             modalContent.innerHTML = `<p class="no-items">Nenhuma comanda selecionada. Por favor, forneça um ID válido.</p>`;
             totalValue.innerHTML = '';
         }
+    </script>
+
+    <!-- BOTÕES DAS AÇÕES DE AUTO ATENDIMENTO -->
+    <div class="divAuto">
+        <button type="button" id="add-item">Adicionar item</button>
+        <button type="button" id="close-comanda">Fechar comanda</button>
+    </div>
+
+
+    <script>
+        let itensDaComandaAtual = [];
+        const addItemBtn = document.getElementById('add-item');
+        const closeComandaBtn = document.getElementById('close-comanda');
+        //const comandaId = document.getElementById("comandaId").value;
+
+        // -------- JAVASCRIPT PARA ADICIONAR ITEM A COMANDA
+        addItemBtn.addEventListener('click', function () {
+            console.log('Redirecionando para comanda:', comandaId);
+            window.location.href = `AutoAtendimento.php?comandaId=${comandaId}`;
+        });
+
+
+        // -------- JAVASCRIPT PARA ENCERRAR A COMANDA
+        closeComandaBtn.addEventListener('click', function () {
+          //const venMesa = parseInt(document.getElementById('venMesa').value);
+        
+          // Coleta os dados dos itens da comanda
+          const itens = itensDaComandaAtual.map(item => ({
+            nome: item.nome,
+            quantidade: item.quantidade
+          }));
+      
+          // Envia os dados para o servidor
+          fetch(`fechar_comanda.php?venMesa=${comandaId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ itens })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.sucesso) {
+              //modal.style.display = 'none';
+              window.location.reload(); // Recarrega a página corretamente
+            } else {
+              alert('Erro ao fechar a comanda: ' + data.erro);
+            }
+          })
+          .catch(error => {
+            console.error('Erro na requisição:', error);
+          });
+        });
     </script>
 </body>
 </html>

@@ -1,16 +1,8 @@
 <?php
 include('forcar_erros.php');
 include('config.php');
-//session_start();
-
-// ✅ Verificação de sessão
-//f (!isset($_SESSION['usuario'])) {
-//   header('Location: Validacao.php');
-//   exit;
-//
 
 // ✅ Validação de parâmetros obrigatórios
-
 $comandaId = !empty($_GET['comandaId']) ? $_GET['comandaId'] : '';
 
 if (
@@ -22,8 +14,7 @@ if (
 
 // 🔧 Dados da comanda
 $Cliente = $_POST['nome_cliente'];
-$Garcon = "Auto Atendimento";
-//$nivel = $_SESSION['nivel'];
+$Garcon = "Auto Atendimento"; // Mantendo o valor original do primeiro código
 $Mesa = $_POST['mesa'];
 $Total = floatval($_POST['total']);
 $itensOriginal = json_decode($_POST['itens_selecionados'], true);
@@ -33,8 +24,8 @@ $mensagens = [];
 $itensParaInserir = []; // <- array só com os itens válidos para a comanda
 
 foreach ($itensOriginal as $item) {
-    $nome = $item['nome'];
-    $quantidade = $item['quantidade'];
+    echo $nome = $item['nome'];
+    echo $quantidade = $item['quantidade'];
 
     // Buscar o produto no estoque
     $sql_estoq = "SELECT etq_Id, etq_Categoria FROM estoque WHERE etq_Nome = ?";
@@ -105,7 +96,6 @@ foreach ($itensOriginal as $item) {
     $teste = $item['subtotal'];
 }
 
-
 // 🔍 Buscar venda existente para a mesa
 $sqlBusca = "SELECT ven_Seq, ven_Itens, ven_Valor FROM vendas 
              WHERE ven_Mesa = ? AND ven_Finalizada <> 'S' 
@@ -117,8 +107,19 @@ $result = $stmtBusca->get_result();
 $vendaExistente = $result->fetch_assoc();
 $stmtBusca->close();
 
-
 if (count($itensParaInserir) === 0) {
+    // Determinar a URL de redirecionamento com base no nível (como no segundo código)
+    $redirectUrl = '';
+    if ($nivel == 'Funcio') {
+        $redirectUrl = "Comandas.php";
+    } elseif ($nivel == 'Admin') {
+        $redirectUrl = "Central_adm.php";
+    } elseif ($nivel == 'Caixa') {
+        $redirectUrl = "Caixa_main.php";
+    } else {
+        $redirectUrl = "AutoComanda.php"; // Padrão para autoatendimento
+    }
+
     // Erro e mensagens em HTML com tempo de redirecionamento
     $mensagensHTML = '';
     foreach ($mensagens as $msg) {
@@ -131,7 +132,7 @@ if (count($itensParaInserir) === 0) {
         <html lang="pt-BR">
         <head>
             <meta charset="UTF-8">
-            <meta http-equiv="refresh" content="8;url=AutoComanda.php"> <!-- Redirecionamento -->
+            <meta http-equiv="refresh" content="8;url=$redirectUrl"> <!-- Redirecionamento baseado no nível -->
             <title>Nenhum item adicionado</title>
             <style>
                 body {
@@ -168,6 +169,12 @@ if (count($itensParaInserir) === 0) {
     exit();
 }
 
+// Cálculo correto do total dos novos itens
+$totalNovosItens = 0;
+foreach ($itensParaInserir as $item) {
+    $totalNovosItens += $item['subtotal'];
+}
+
 // ✅ Atualiza ou cria a venda
 if ($vendaExistente) {
     $venSeq = $vendaExistente['ven_Seq'];
@@ -189,16 +196,28 @@ if ($vendaExistente) {
         }
     }
 
-    $novoTotal = $teste + $totalAnterior;
+    // Correção: Usar $totalNovosItens em vez de $teste para calcular o novo total
+    $novoTotal = $totalNovosItens + $totalAnterior;
 
+    echo "Total Novos Itens: " . $totalNovosItens . " + Total Anterior: " . $totalAnterior . " = Novo Total: " . $novoTotal . "<br>";
+    echo $venSeq . "<br>";
+    
     $itensJson = json_encode($itensAntigos, JSON_UNESCAPED_UNICODE);
+    var_dump($itensJson); echo "<br>";
 
     $stmtUpdate = $conn->prepare("UPDATE vendas SET ven_Itens = ?, ven_Valor = ? WHERE ven_Seq = ?");
     $stmtUpdate->bind_param("sdi", $itensJson, $novoTotal, $venSeq);
     $stmtUpdate->execute();
     $stmtUpdate->close();
 } else {
+    // Mantém a lógica original para novas vendas
+    echo $Cliente . "<br>";
+    echo $Garcon . "<br>";
+    echo $Total . "<br>";
+    echo $Mesa . "<br>";
+    
     $itensJson = json_encode($itensParaInserir, JSON_UNESCAPED_UNICODE);
+    var_dump($itensJson); echo "<br>";
     $stmtVenda = $conn->prepare("INSERT INTO vendas (ven_Cliente, ven_Garcom, ven_Valor, ven_Data, ven_Mesa, ven_Itens, ven_Finalizada) 
                                  VALUES (?, ?, ?, NOW(), ?, ?, 'N')");
     if ($stmtVenda) {
@@ -209,5 +228,4 @@ if ($vendaExistente) {
 }
 
 header("Location: AutoComandas.php?comandaId=$comandaId");
-
 ?>

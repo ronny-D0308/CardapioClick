@@ -316,6 +316,13 @@
         cursor: pointer;
       }
     }
+    /*----- ESTILO DOS BOTÕES DE FORMA DE PAGAMENTO ----*/
+        .botoesformapag {
+            background-color: #da6c22;
+            color: white; 
+            font-size: 15px;
+            margin: 5px;
+        }
 
   </style>
 </head>
@@ -606,7 +613,6 @@
     });
 
 
-
     closeBtn.addEventListener('click', function() {
       modal.style.display = 'none';
     });
@@ -633,10 +639,6 @@
         //alert('Nenhuma comanda selecionada.');
       }
     });
-
-    //botaoVale.addEventListener('click', function() {
-    //  valeModal.style.display = 'block';
-    //});
 
     // Exibe o controle de quantidade quando o checkbox for marcado
     const checkboxes = document.querySelectorAll('.menu-item input[type="checkbox"]');
@@ -698,33 +700,92 @@
     closeComandaBtn.addEventListener('click', function () {
       const venMesa = parseInt(document.getElementById('venMesa').value);
       
-    
       // Coleta os dados dos itens da comanda
       const itens = itensDaComandaAtual.map(item => ({
         nome: item.nome,
         quantidade: item.quantidade
       }));
-    
-      // Envia os dados para o servidor
-      fetch(`fechar_comanda.php?venMesa=${venMesa}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ itens })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.sucesso) {
-          modal.style.display = 'none';
-          window.location.reload(); // Recarrega a página corretamente
-        } else {
-          alert('Erro ao fechar a comanda: ' + data.erro);
-        }
-      })
-      .catch(error => {
-        console.error('Erro na requisição:', error);
-      });
+
+      if (confirm("Deseja realmente finalizar e imprimir esta comanda?")) {
+
+          // Cria o overlay
+          const overlay = document.createElement('div');
+          overlay.style.position = 'fixed';
+          overlay.style.top = '0';
+          overlay.style.left = '0';
+          overlay.style.width = '100%';
+          overlay.style.height = '100%';
+          overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+          overlay.style.zIndex = '999'; // Abaixo do modal, acima do resto da página
+          document.body.appendChild(overlay);
+
+              // Cria um modal simples com select para forma de pagamento
+          const modal = document.createElement('div');
+          modal.style.position = 'fixed';
+          modal.style.top = '50%';
+          modal.style.left = '50%';
+          modal.style.transform = 'translate(-50%, -50%)';
+          modal.style.backgroundColor = 'white';
+          modal.style.padding = '20px';
+          modal.style.border = '1px solid #ccc';
+          modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+          modal.style.zIndex = '1000';
+          modal.style.display = 'flex';
+          modal.style.flexDirection = 'column'; // Organiza os itens em coluna
+          modal.style.justifyContent = 'center'; // Centraliza horizontalmente os itens internos
+          modal.style.alignItems = 'center'; // Corrige o erro de digitação, centraliza verticalmente os itens internos
+          modal.style.width = '300px'; // Define uma largura fixa para consistência
+          modal.style.height = '250px';
+          modal.style.borderRadius = '8px'; // Opcional: bordas arredondadas para melhor estética
+          modal.innerHTML = `
+              <h4 style='color:black;'>Selecione a Forma de Pagamento</h4>
+              <select id="formaPagamento">
+                  <option value="">Selecione...</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Cartão de Crédito">Cartão de Crédito</option>
+                  <option value="Cartão de Débito">Cartão de Débito</option>
+                  <option value="PIX">PIX</option>
+              </select>
+              <br><br>
+              <button class='botoesformapag' onclick="confirmarPagamento()">Confirmar</button>
+              <button class='botoesformapag' onclick="cancelarPagamento()">Cancelar</button>
+          `;
+          document.body.appendChild(modal);
+
+          // Funções globais para confirmar ou cancelar (devem ser acessíveis no escopo da página)
+          window.confirmarPagamento = function() {
+              const formaPag = document.getElementById('formaPagamento').value;
+              if (formaPag) {
+
+                  // Envia os dados para o servidor
+                  fetch(`fechar_comanda.php?venMesa=${venMesa}&formapag=${encodeURIComponent(formaPag)}`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ itens })
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                    if (data.sucesso) {
+                      modal.style.display = 'none';
+                      window.location.reload(); // Recarrega a página corretamente
+                    } else {
+                      alert('Erro ao fechar a comanda: ' + data.erro);
+                    }
+                  })
+                  .catch(error => {
+                    console.error('Erro na requisição:', error);
+                  });
+              }
+          }
+
+          window.cancelarPagamento = function() {
+              document.body.removeChild(modal);
+              //alert("Operação cancelada.");
+              window.location.reload();
+          };
+      }
     });
 
     // Selecionando os elementos
