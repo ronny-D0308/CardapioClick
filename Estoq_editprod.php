@@ -125,6 +125,8 @@
 
 
         function editarValor(botao) {
+            const foralinha = document.getElementById("foralinha");
+            foralinha.style.display = 'flex';
             // Encontra a linha (tr) do botão clicado
             const linha = botao.closest("tr");
         
@@ -169,35 +171,15 @@
                     <option value="Bomboniere" > Bomboniere </option>
                 </select>
             </span>
-            
-            <!--
-            <span>
-                <label for="quantidade">Quantidade:</label>
-                <div style="display: flex; align-items: center; gap: 10px">
-                    <button type="button" onclick="alterarQuantidade(-1)">−</button>
-                    <input type="text" name="quantidade" id="quantidade" value="0" min="0">
-                    <button type="button" onclick="alterarQuantidade(1)">+</button>
-                </div>
+
+            <span style="display: none;" id="foralinha">
+                <label for="Ativar_desativar">Ativar / Desativar:</label>
+                <select name="Ativar_desativar" id="Ativar_desativar">
+                    <option value="S" > Ativar </option>
+                    <option value="N" > Desativar </option>
+                </select>
             </span>
-            
-            <span>
-                <label for="preco">Preço:</label>
-                <input type="text" name="preco" id="preco">
-            </span>
-            
-            <span>
-                <label for="fornecedor">Fornecedor:</label>
-                <input type="text" name="fornecedor" id="fornecedor">
-            </span>
-            
-            <span>
-                <label for="Datavenci">Data de Validade:</label>
-                <input type="date" name="Datavenci" id="Datavenci">
-            </span>
-            <span>
-                <label for="fornecedor">Código:</label>
-                <input type="text" name="fornecedor" id="fornecedor">
-            </span> -->
+
 
             <div style="text-align: center; width: 100%">
                 <input class="botao" type="submit" name="" value="Editar Produto">
@@ -277,9 +259,10 @@
             $etqId = $_POST['etqId'];
             $NomeProd = $_POST['NomeProd'];
             $categoria = $_POST['categoria'];
+            $Ativar_desativar = $_POST['Ativar_desativar'];
 
             if (!empty($NomeProd)) {
-                $sql_insert = "UPDATE estoque SET etq_Nome = '$NomeProd', etq_Categoria = '$categoria' WHERE etq_Id = $etqId";
+                $sql_insert = "UPDATE estoque SET etq_Nome = '$NomeProd', etq_Categoria = '$categoria', etq_Ativo = '$Ativar_desativar' WHERE etq_Id = $etqId";
                     //echo $sql_insert;
                 $query_insert = mysqli_query($conn, $sql_insert);
 

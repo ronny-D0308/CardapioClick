@@ -1,7 +1,8 @@
 <?php
-    //error_reporting(0);       // Desativa todos os relatórios de erro
-    //ini_set('display_errors', 0);  // Garante que os erros não sejam exibidos na tela
-
+    error_reporting(0);       // Desativa todos os relatórios de erro
+    ini_set('display_errors', 0);  // Garante que os erros não sejam exibidos na tela
+    
+    //include('forcar_erros.php');
     include('config.php');
 	session_start();
 
@@ -31,6 +32,10 @@
             http_response_code(500);
             echo "Erro ao finalizar comanda ou comanda já finalizada.";
         }
+    } elseif ($flag == 'Deletacomanda') {
+        $mesa = intval($_POST['mesa'] ?? $_GET['mesa'] ?? 0);
+        $delete = "DELETE FROM vendas WHERE ven_Mesa = $mesa AND ven_Finalizada <> 'S'";
+        $querydelete = mysqli_query($conn, $delete);
     }
 ?>
 
@@ -250,14 +255,13 @@
         /*------ STYLE PARA A ANÁLISE DE VENDAS -------*/
         .container-tabela {
             margin: 0 auto;
-            width: 80%;
+            width: 85%;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 15px 15px 0 0;
             display: flex;
             flex-direction: row;
             flex-wrap: wrap;
             justify-content: space-around;
-            gap: 0px 10px;
             padding: 10px;
         }
         .filtros {
@@ -299,7 +303,53 @@
                 font-size: 15px;
                 margin: 5px;
             }
+
+        .botaoProd {
+            width: auto;
+            height: 30px;
+            margin: 5px;
+            font-size: 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
     </style>
+
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", function() {
+            // Certifique-se de que o elemento existe antes de adicionar o listener
+            const btnDelete = document.querySelector('.Deletacomanda');
+        
+            if (btnDelete) {
+                btnDelete.addEventListener('click', function () {
+                    // Pegue a mesa do input hidden, se necessário
+                    const mesa = document.getElementById('venMesa').value;
+        
+                    // Confirmação
+                    if (confirm('Deseja deletar a comanda?')) {
+                        // Faça a requisição para deletar (AJAX ou redirecionamento)
+                        // Exemplo com redirecionamento:
+                        window.location.href = `Central_adm.php?flag=Deletacomanda&mesa=${mesa}`;
+        
+                        // OU, melhor ainda, usando AJAX (fetch):
+                        /*
+                        fetch(`seuarquivo.php?flag=deletar&venMesa=${mesa}`)
+                            .then(resp => resp.json())
+                            .then(data => {
+                                if (data.success) {
+                                    alert('Comanda deletada!');
+                                    // Update UI, close modal, etc
+                                } else {
+                                    alert('Falha ao deletar!');
+                                }
+                            })
+                            .catch(() => alert('Erro ao deletar.'));
+                        */
+                    }
+                });
+            }
+        });
+    </script>
 
 </head>
 
@@ -308,6 +358,7 @@
     <div class="modal-content">
       <span class="close">&times;</span>
       <h2>Comanda Detalhada</h2>
+
       <div id="modal-content-body"></div>
 
       <input type="hidden" id="venMesa" value="">
@@ -316,6 +367,12 @@
       <div class="div-botao">
         <button type="button" id="add-item">Adicionar item</button>
       </div>
+
+        <span style="position: absolute; top: 90%; left: 90%; background-color: #E70A0A; width: 35px; height: auto; display: flex; justify-content: center; align-items: center; cursor:pointer;" 
+              class="Deletacomanda" title="Deletar comanda">
+            <h1 style="margin:0;color:#fff;font-size:24px;">x</h1>
+        </span>
+
     </div>
 </div>
 
@@ -517,10 +574,10 @@
                         <h4 style='color:black;'>Selecione a Forma de Pagamento</h4>
                         <select id="formaPagamento">
                             <option value="">Selecione...</option>
-                            <option value="Dinheiro">Dinheiro</option>
-                            <option value="Cartão de Crédito">Cartão de Crédito</option>
-                            <option value="Cartão de Débito">Cartão de Débito</option>
-                            <option value="PIX">PIX</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="credito">Cartão de Crédito</option>
+                            <option value="debito">Cartão de Débito</option>
+                            <option value="pix">PIX</option>
                         </select>
                         <br><br>
                         <button class='botoesformapag' onclick="confirmarPagamento()">Confirmar</button>
@@ -550,7 +607,7 @@
                                 })
                                 .catch(error => {
                                     console.error(error);
-                                    alert("Erro ao finalizar comanda.");
+                                    //alert("Erro ao finalizar comanda.");
                                 });
                             document.body.removeChild(modal);
                         } else {
@@ -586,7 +643,7 @@
                     try {
                         itensComanda = JSON.parse(itensRaw);
                     } catch (e) {
-                        alert("Erro ao processar itens da comanda.");
+                        //alert("Erro ao processar itens da comanda.");
                         return;
                     }
 
@@ -686,11 +743,12 @@
                         if (!printResponse.ok) {
                             throw new Error('Falha na impressão');
                         }
-                    
-                        alert('Comanda impressa com sucesso!');
+                        
+                        window.location.reload();
+                        //alert('Comanda impressa com sucesso!');
                     } catch (error) {
                         console.error('Erro:', error);
-                        alert('Usando impressão alternativa: ' + error.message);
+                        //alert('Usando impressão alternativa: ' + error.message);
                         imprimir(); // Fallback para impressão pelo navegador
                     }
                 }
@@ -706,76 +764,105 @@
 
 
     <!-------------------------------------------------- LOCAL DE ANÁLISE DE VENDAS  ------------------------------------------------------------>
+
+    <?php
+        $consulDataini = $_POST['dataini'] ?? '';
+        $consulDatafim = $_POST['datafim'] ?? '';
+        $consulFormapag = $_POST['formapag'] ?? '';
+        $produtoNome = $_POST['produtoNome'] ?? '';
+    ?>
     <section class="sessão">
         <h1 class="title"> Análise de vendas </h1>
         
         <div class="filtros">
-            <span>
-                <label> De: </label>
-                <input type="date" name="dataini" id="dataini">
-                <label> até: </label>
-                <input type="date" name="datafim" id="datafim">
-            </span>
-            <select name="formapag" id="formapag">
-                <option value="Todos">Todos</option>
-                <option value="Cartao">Cartão</option>
-                <option value="Pix">Pix</option>
-                <option value="Dinheiro">Dinheiro</option>
-            </select>
+            <form action="" method="POST" id="formfiltros">
+                <span>
+                    <label> De: </label>
+                    <input type="date" name="dataini" id="dataini" value='<?php echo htmlspecialchars($consulDataini); ?>'>
+                    <label> até: </label>
+                    <input type="date" name="datafim" id="datafim" value='<?php echo htmlspecialchars($consulDatafim); ?>'>
+                </span>
+                <select name="formapag" id="formapag" value='<?php echo htmlspecialchars($consulFormapag); ?>'>
+                    <option value="Todos">Todos</option>
+                    <option value="credito">Cartão de Crédito</option>
+                    <option value="debito">Cartão de Débito</option>
+                    <option value="pix">Pix</option>
+                    <option value="dinheiro">Dinheiro</option>
+                </select>
 
-            <select name="produtos" id="produtos">
-                <?php
-                    $sql_prods = "SELECT etq_Nome, etq_Id FROM estoque WHERE etq_Ativo <> 'N'";
-                    $query_prods = mysqli_query($conn, $sql_prods);
-                    if (mysqli_num_rows($query_prods) > 0) {
-                        echo "<option value='Todos'> Todos </option>";
-                        while ($linhas = mysqli_fetch_object($query_prods)) {
-                            echo "<option value='". $linhas->etq_Id ."'> ". $linhas->etq_Nome ."</option>";
-                        }
-                    } else {
-                        echo "<option value=''> Nenhum item ativo </option>";
-                    }
-                ?>
-            </select>
+                <input type="submit" name="" value="Filtrar">
+                <input type="button" name="" value="Limpar filtros" onclick="limpar()">
+            </form>
 
         </div>
-
             <div class="container-tabela">
 
                 <!-- CARTÕES E GRÁFICO DE COLUNAS -->
-                <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 850px; gap: 10px;">
+                <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 900px; gap: 10px;">
+
                     <!--CARD FATURAMENTO TOTAL -->
                     <div class="Card">
                     <?php
-                        $sql_BI = "SELECT SUM(ven_Valor) AS Faturamento FROM vendas";
+                        $consulDataini = $_POST['dataini'] ?? '';
+                        $consulDatafim = $_POST['datafim'] ?? '';
+                        $consulFormapag = $_POST['formapag'] ?? '';
+                        
+                        $condicao = '';
+                        
+                        if (!empty($consulDataini) && !empty($consulDatafim) && !empty($consulFormapag) && $consulFormapag == 'Todos') {
+                            $condicao = " WHERE ven_Data BETWEEN '$consulDataini' AND '$consulDatafim'";
+                        } elseif (!empty($consulDataini) && !empty($consulDatafim) && !empty($consulFormapag) && $consulFormapag !== 'Todos') {
+                            $condicao = " WHERE ven_Data BETWEEN '$consulDataini' AND '$consulDatafim'AND ven_Formapag = '$consulFormapag'";
+                        }
+                        
+                        $sql_BI = "SELECT SUM(ven_Valor) AS Faturamento FROM vendas" . $condicao;
                         $result_BI = $conn->query($sql_BI); 
                         $linhas = mysqli_fetch_object($result_BI);
-                        echo "Faturamento R$ ". number_format($linhas->Faturamento ,'2',',','.');
+                        echo "Faturamento Bruto R$ " . number_format($linhas->Faturamento ?? 0, 2, ',', '.');
                     ?>
                     </div>
 
                     <!--CARD TICKET MÉDIO -->
                     <div class="Card">
                     <?php
-                        $sql_BI_tk = "SELECT COUNT(ven_Mesa) AS Mesas FROM vendas";
+                        $sql_BI_tk = "SELECT COUNT(ven_Mesa) AS Mesas FROM vendas". $condicao;
                         $result_BI_tk = $conn->query($sql_BI_tk); 
                         $linhas_tk = mysqli_fetch_object($result_BI_tk);
-                        $ticket = $linhas->Faturamento / $linhas_tk->Mesas;
-                        echo "Ticket Médio ". number_format($ticket, 2, ',', '.');
+                        $ticket = 0;
+                        $faturamento = !empty($linhas->Faturamento) ? $linhas->Faturamento : 0;
+                        $mesas = !empty($linhas_tk->Mesas) ? $linhas_tk->Mesas : 0;
+                        
+                        if ($mesas > 0) {
+                            $ticket = $faturamento / $mesas;
+                        } else {
+                            $ticket = 0; // Ou pode deixar como null, ou alguma outra tratativa
+                        }
+                        echo 'Ticket Médio: R$ ' . number_format($ticket, 2, ',', '.');
                     ?>
                     </div>
 
                     <!--CARD CUSTOS -->
                     <div class="Card" style="width: 280px;">
                     <?php
+                        
+                        $condicao = '';
+                        if (!empty($consulDataini) && !empty($consulDatafim) && !empty($consulFormapag) && $consulFormapag == 'Todos') {
+                            $condicao1 = " WHERE ven_Data BETWEEN '$consulDataini' AND '$consulDatafim'";
+                            $condicao2 = " WHERE rom_Dataentrada BETWEEN '$consulDataini' AND '$consulDatafim'";
+                        } elseif (!empty($consulDataini) && !empty($consulDatafim) && !empty($consulFormapag) && $consulFormapag !== 'Todos') {
+                            $condicao1 = " WHERE ven_Data BETWEEN '$consulDataini' AND '$consulDatafim'AND ven_Formapag = '$consulFormapag'";
+                            $condicao2 = " WHERE rom_Dataentrada BETWEEN '$consulDataini' AND '$consulDatafim'";
+                        }
+
                         $sql_BI_Des = "SELECT 
-                                    (SELECT SUM(ven_Valor) FROM vendas) AS Faturamento,
-                                    (SELECT SUM(rom_Preco) FROM romaneio) AS Despesas";
+                                    (SELECT SUM(ven_Valor) FROM vendas ". $condicao1 .") AS Faturamento,
+                                    (SELECT SUM(rom_Preco) FROM romaneio ". $condicao2 .") AS Despesas";
+                            //echo $sql_BI_Des;
                         $result_BI_Des = $conn->query($sql_BI_Des); 
                         $linhas_Des = mysqli_fetch_object($result_BI_Des);
                         $Custo = $linhas_Des->Faturamento - $linhas_Des->Despesas;
-                        echo "Lucro Bruto R$ ". number_format($Custo ,'2',',','.');
-                        echo "<p> Receita - custos </p>"; 
+                        echo "Lucro R$ ". number_format($Custo ,'2',',','.');
+                        echo "<p> ". number_format($linhas_Des->Faturamento,'2',',','.') ." - ". number_format($linhas_Des->Despesas,'2',',','.') ." </p>"; 
                     ?>
                     </div>
 
@@ -785,7 +872,10 @@
                         // Faturamento por mês
                         $faturamentos = [];
                         $sql_faturamento = "SELECT DATE_FORMAT(ven_Data, '%Y-%m') AS Mes, SUM(ven_Valor) AS Faturamento 
-                                            FROM vendas GROUP BY Mes ORDER BY Mes";
+                                            FROM vendas
+                                            ". $condicao1 ." 
+                                            GROUP BY Mes 
+                                            ORDER BY Mes";
                         $query_faturamento = mysqli_query($conn, $sql_faturamento);
                         while($row = mysqli_fetch_assoc($query_faturamento)){
                             $faturamentos[$row['Mes']] = floatval($row['Faturamento']);
@@ -794,7 +884,10 @@
                         // Despesas por mês
                         $despesas = [];
                         $sql_despesas = "SELECT DATE_FORMAT(rom_Dataentrada, '%Y-%m') AS Mes, SUM(rom_Preco) AS Despesas 
-                                         FROM romaneio GROUP BY Mes ORDER BY Mes";
+                                         FROM romaneio 
+                                         ". $condicao2 ."
+                                         GROUP BY Mes 
+                                         ORDER BY Mes";
                         $query_despesas = mysqli_query($conn, $sql_despesas);
                         while($row = mysqli_fetch_assoc($query_despesas)){
                             $despesas[$row['Mes']] = floatval($row['Despesas']);
@@ -873,35 +966,39 @@
                 <!-- CARD GRÁFICO DE FORMAS DE PAGAMENTO -->
                 <div class="Card" id="container" style="width: 400px; height: auto; border-radius: 10px;">
                     <?php
-                    // Consulta SQL ajustada para agrupar por forma de pagamento
-                    $sql_BI_Fp = "SELECT SUM(ven_Valor) AS Faturamento, ven_Formapag FROM vendas WHERE ven_Finalizada = 'S' GROUP BY ven_Formapag";
-                    $result_BI_Fp = $conn->query($sql_BI_Fp);
+                        $sql_BI_Fp = "SELECT SUM(ven_Valor) AS Faturamento, ven_Formapag 
+                                      FROM vendas 
+                                      ". $condicao1 ." 
+                                      GROUP BY ven_Formapag";
+                        $result_BI_Fp = $conn->query($sql_BI_Fp);
 
-                    // Array para armazenar os dados de formas de pagamento
-                    $formasPagamento = [];
-                    while ($row = mysqli_fetch_assoc($result_BI_Fp)) {
-                        $forma = $row['ven_Formapag'] ? htmlspecialchars($row['ven_Formapag']) : 'Não Informado';
-                        $faturamento = floatval($row['Faturamento']);
-                        $formasPagamento[] = [$forma, $faturamento];
-                    }
-                    // Se não houver dados, definir um array padrão para evitar erros no gráfico
-                    if (empty($formasPagamento)) {
-                        $formasPagamento = [
-                            ['Cartão de Débito', 0],
-                            ['Cartão de Crédito', 0],
-                            ['Pix', 0],
-                            ['Dinheiro', 0]
-                        ];
-                    }
+                        // Array para armazenar os dados de formas de pagamento
+                        $formasPagamento = [];
+                        while ($row = mysqli_fetch_assoc($result_BI_Fp)) {
+                            $forma = $row['ven_Formapag'] ? htmlspecialchars($row['ven_Formapag']) : 'Não Informado';
+                            $faturamento = floatval($row['Faturamento']);
+                            $formasPagamento[] = [$forma, $faturamento];
+                        }
+                        // Se não houver dados, definir um array padrão para evitar erros no gráfico
+                        if (empty($formasPagamento)) {
+                            $formasPagamento = [
+                                ['Cartão de Débito', 0],
+                                ['Cartão de Crédito', 0],
+                                ['Pix', 0],
+                                ['Dinheiro', 0]
+                            ];
+                        }
                     ?>
                     
 
                     <script>
+                        var cores = ["#FF6384", "#3D52BB", "#FFCE56", "#34A853","#F16838"]; // rosa, azul, amarelo, verde
                         anychart.onDocumentReady(function () {
                             // Cria uma instância de um gráfico de pizza
                             var chart = anychart.pie();
                             // Define os dados dinamicamente a partir do PHP
                             chart.data(<?php echo json_encode($formasPagamento); ?>);
+                            chart.palette(cores); // <--- Adiciona esta linha
                             // Define o título do gráfico
                             chart.title("Formas de Pagamento");
                             // Define o container do gráfico
@@ -914,7 +1011,154 @@
                     </script>
                 </div>
 
+                <script type="text/javascript">
+                    function limpar() {
+                        const form = document.getElementById("formfiltros");
+                        form.reset();
+                        form.submit();
+                    }
+                </script>
+
+
+                <!--------------------------------------------- ANÁLISE MAIS GRANULADA (PRODUTOS) ---------------------------------------------------->
+                
+                <!-- CARTÕES E GRÁFICO DE COLUNAS -->
+                <div style="margin-top: 50px; display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 100%; gap: 10px;">
+
+                    <div class="filtros">
+                        <form action="" method="POST" id="formProd" style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap;">
+                            <input type="hidden" id="inputProd" name="produtoNome" value='<?php echo htmlspecialchars($produtoNome); ?>'>
+                            <input type="hidden" name="dataini" id="dataini" value='<?php echo htmlspecialchars($consulDataini); ?>'>
+                            <input type="hidden" name="datafim" id="datafim" value='<?php echo htmlspecialchars($consulDatafim); ?>'>
+                            
+                            <?php
+                                $prod = "SELECT etq_Id, etq_Nome FROM estoque";
+                                $query_prod = mysqli_query($conn, $prod);
+                                if (mysqli_num_rows($query_prod) > 0) {
+                                    while ($prodLinha = mysqli_fetch_object($query_prod)) {
+                                        echo "<button class='botaoProd' value='". $prodLinha->etq_Nome ."' onclick='consulProd(this)'>". $prodLinha->etq_Nome ."</button>";
+                                    }
+                                }
+                            ?>
+                        </form>
+
+                    </div>
+
+                    <!--CARD FATURAMENTO TOTAL -->
+                    <div class="Card">
+                    <?php
+                        $produtoNome = mysqli_real_escape_string($conn, $_POST['produtoNome'] ?? '');
+                        
+                        $condicoes = [];
+                        if (!empty($consulDataini) && !empty($consulDatafim) && !empty($produtoNome)) {
+                            $condicoes[] = "ven_Data BETWEEN '$consulDataini' AND '$consulDatafim'";
+                        }
+                        
+                        $where = $condicoes ? "WHERE " . implode(" AND ", $condicoes) : "";
+                        
+                        $sql = "
+                            SELECT SUM(item.subtotal) AS Faturamento
+                            FROM vendas
+                            JOIN JSON_TABLE(
+                                ven_Itens,
+                                '$[*]' COLUMNS (
+                                    nome VARCHAR(255) PATH '$.nome',
+                                    subtotal DECIMAL(10,2) PATH '$.subtotal'
+                                )
+                            ) AS item
+                            ON 1=1
+                            $where
+                            AND item.nome = '$produtoNome'
+                        ";
+                        
+                        $result = $conn->query($sql);
+                        $linha = mysqli_fetch_object($result);
+                        echo "Faturamento Bruto R$ " . number_format($linha->Faturamento ?? 0, 2, ',', '.');
+                    ?>
+                    </div>
+
+                    <!--CARD TICKET MÉDIO -->
+                    <div class="Card">
+                        <?php
+                            $sql_Tk = "
+                                SELECT
+                                    COUNT(v.ven_Mesa) AS Mesas,
+                                    SUM(item.subtotal) AS Faturamento
+                                FROM vendas v
+                                JOIN JSON_TABLE(
+                                    v.ven_Itens,
+                                    '$[*]' COLUMNS (
+                                        nome VARCHAR(255) PATH '$.nome',
+                                        subtotal DECIMAL(10,2) PATH '$.subtotal'
+                                    )
+                                ) AS item ON 1=1
+                                $where
+                                AND item.nome = '$produtoNome'
+                            ";
+                        
+                            $result = $conn->query($sql_Tk);
+                            $linha = mysqli_fetch_object($result);
+                        
+                            $faturamento = !empty($linha->Faturamento) ? $linha->Faturamento : 0;
+                            $mesas = !empty($linha->Mesas) ? $linha->Mesas : 0;
+                            if ($mesas > 0) {
+                                $ticket = $faturamento / $mesas;
+                            } else {
+                                $ticket = 0;
+                            }
+                            echo 'Ticket Médio do produto: R$ ' . number_format($ticket, 2, ',', '.');
+                        ?>
+                    </div>
+
+                    <!--CARD CUSTOS -->
+                    <div class="Card" style="width: 280px;">
+                        <?php
+                            $where = [];
+                            if (!empty($consulDataini) && !empty($consulDatafim)) {
+                                $where[] = "r.rom_Dataentrada BETWEEN '$consulDataini' AND '$consulDatafim'";
+                            }
+                            if (!empty($produtoNome)) {
+                                $where[] = "e.etq_Nome = '$produtoNome'";
+                            }
+                            $condicaoSQL = $where ? "WHERE " . implode(' AND ', $where) : "";
+                            
+                            $sql = "
+                                SELECT 
+                                    SUM(r.rom_Preco) AS Despesas,
+                                    e.etq_Id,
+                                    r.rom_Idproduto
+                                FROM romaneio r
+                                INNER JOIN estoque e ON e.etq_Id = r.rom_Idproduto
+                                $condicaoSQL
+                            ";
+                            
+                            $result_BI_Des = $conn->query($sql); 
+                            $linhas_Des = mysqli_fetch_object($result_BI_Des);
+                            echo "Custos R$ " . number_format($linhas_Des->Despesas ?? 0, 2, ',', '.');
+                        ?>
+                    </div>
+
+                    <!--CARD LUCRO -->
+                    <div class="Card" style="width: 280px;">
+                        <?php
+                            $Custo = $linha->Faturamento - $linhas_Des->Despesas;
+                            echo "Lucro R$ ". number_format($Custo ,'2',',','.');
+                            echo "<p> ". number_format($linha->Faturamento,'2',',','.') ." - ". number_format($linhas_Des->Despesas,'2',',','.') ." </p>"; 
+                        ?>
+                    </div>
+
+                    <script>
+                        function consulProd(button) {
+                            var valor = button.value;
+                            // Define o valor no campo oculto
+                            document.getElementById("inputProd").value = valor;
+                            // Submete o formulário
+                            document.getElementById("formProd").submit();
+                        }
+                    </script>
+                </div>
             </div>
+
     </section>
     
 

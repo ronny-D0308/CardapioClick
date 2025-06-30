@@ -143,7 +143,7 @@ $query = mysqli_query($conn, $sql_del);
                     Editar Produto </a> </li>
             <li> <a class="links" href="Estoq_removprod.php" > 
                     <img src="imagens/remove.png" width="20px">
-                    Remover Produto </a> </li>
+                    Desativar Produto </a> </li>
 
             <li> <a class="links" href="Estoq_entradaProd.php" > 
                     <img src="imagens/enter.png" width="20px">

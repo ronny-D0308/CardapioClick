@@ -442,10 +442,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['Valorfechamento'])) {
               <h4 style='color:black;'>Selecione a Forma de Pagamento</h4>
               <select id="formaPagamento">
                   <option value="">Selecione...</option>
-                  <option value="Dinheiro">Dinheiro</option>
-                  <option value="Cartão de Crédito">Cartão de Crédito</option>
-                  <option value="Cartão de Débito">Cartão de Débito</option>
-                  <option value="PIX">PIX</option>
+                  <option value="dinheiro">Dinheiro</option>
+                  <option value="credito">Cartão de Crédito</option>
+                  <option value="debito">Cartão de Débito</option>
+                  <option value="pix">PIX</option>
               </select>
               <br><br>
               <button class='botoesformapag' onclick="confirmarPagamento()">Confirmar</button>

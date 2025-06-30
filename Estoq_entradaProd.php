@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
 
     // INICIA AS VERIFICAÇÕES PARA INSERÇÃO DE VALORES NO ESTOQUE
     if ($categoria == "Carnes") {
-        $valor = $quantidade * $Preco;
+        $valor = $Preco;
         $quantidade = $quantidade * 1000;
     }
     else if ($categoria == "Bebidas") {

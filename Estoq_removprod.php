@@ -17,7 +17,7 @@
     <meta charset="utf-8">
     <link rel="icon" href="Cardapioclick.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title> .:Remover Produto:. </title>
+    <title> .:Remover Desativar:. </title>
 
     <style type="text/css">
         @import url('https://fonts.googleapis.com/css2?family=Kreon:wght@300..700&display=swap');
@@ -107,7 +107,7 @@
     <a class="sair" style="text-decoration:none; position: absolute; top: 1%; left: 2%;" href="Estoque_main.php"> <img src="imagens/left.png" width="40px" > </a>
 
     <div class="conteiner">
-        <h1> Remover produto do estoque </h1>
+        <h1> Desativar produto do estoque </h1>
     </div>
 
     <!-- TABELA DE REGISTROS -->

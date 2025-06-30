@@ -53,7 +53,7 @@ foreach ($itensOriginal as $item) {
     // Buscar quantidade disponível no romaneio
     $sql_romaneio = "SELECT rom_Id, rom_Quantidade FROM romaneio 
                      WHERE rom_Idproduto = ? AND rom_Quantidade > 0 
-                     ORDER BY rom_Id ASC LIMIT 1";
+                     ORDER BY rom_Id ASC LIMIT 2";
     $stmt_rom = $conn->prepare($sql_romaneio);
     $stmt_rom->bind_param("i", $IdProd);
     $stmt_rom->execute();
@@ -209,7 +209,7 @@ if ($vendaExistente) {
     $stmtVenda = $conn->prepare("INSERT INTO vendas (ven_Cliente, ven_Garcom, ven_Valor, ven_Data, ven_Mesa, ven_Itens, ven_Finalizada) 
                                  VALUES (?, ?, ?, NOW(), ?, ?, 'N')");
     if ($stmtVenda) {
-        $stmtVenda->bind_param("ssdis", $Cliente, $Garcon, $Total, $Mesa, $itensJson);
+        $stmtVenda->bind_param("ssdis", $Cliente, $Garcon, $teste, $Mesa, $itensJson);
         $stmtVenda->execute();
         $stmtVenda->close();
     }
