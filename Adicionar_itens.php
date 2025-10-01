@@ -290,6 +290,7 @@
 						<label class="nome">Guaraná 1LT</label>
 						<input name="B2" class="QUANT"  id="B2" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					<!--
 					<div class="conteiner-produto">
 						<label class="nome">Devassa</label>
 						<input name="B3" class="QUANT"  id="B3" type="number"  min="0" onblur="atualizarTotal()">
@@ -298,6 +299,7 @@
 						<label class="nome">Pitchulinha</label>
 						<input name="B4" class="QUANT"  id="B4" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					-->
 					<div class="conteiner-produto">
 						<label class="nome">Refrigerante Lata</label>
 						<input name="B5" class="QUANT"  id="B5" type="number"  min="0" onblur="atualizarTotal()">
@@ -314,10 +316,12 @@
 						<label class="nome">Àgua sem gás</label>
 						<input name="B08" class="QUANT"  id="B08" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					<!--
 					<div class="conteiner-produto">
 						<label class="nome">Aquárius Fresh</label>
 						<input name="B9" class="QUANT"  id="B9" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					-->
 					<div class="conteiner-produto">
 						<label class="nome">Heineken 600ml</label>
 						<input name="B10" class="QUANT"  id="B10" type="number"  min="0" onblur="atualizarTotal()">
@@ -326,21 +330,20 @@
 						<label class="nome">Coca zero</label>
 						<input name="B11" class="QUANT"  id="B11" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
-
 					<div class="conteiner-produto">
 						<label class="nome">Heineken Long Neck</label>
 						<input name="B12" class="QUANT"  id="B12" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
-
-					<!--
 					<div class="conteiner-produto">
 						<label class="nome">Corona Long Neck</label>
 						<input name="B13" class="QUANT"  id="B13" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					<!--
 					<div class="conteiner-produto">
 						<label class="nome">Spaten Long Neck</label>
 						<input name="B14" class="QUANT"  id="B14" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					-->
 					<div class="conteiner-produto">
 						<label class="nome">Budweiser Long Neck</label>
 						<input name="B15" class="QUANT"  id="B15" type="number"  min="0" onblur="atualizarTotal()">
@@ -349,10 +352,12 @@
 						<label class="nome">Stella Artois Long Neck</label>
 						<input name="B16" class="QUANT"  id="B16" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					<!--
 					<div class="conteiner-produto">
 						<label class="nome">Ice Smirnoff</label>
 						<input name="B17" class="QUANT"  id="B17" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					-->
 					<div class="conteiner-produto">
 						<label class="nome">Ice Cabaré</label>
 						<input name="B18" class="QUANT"  id="B18" type="number"  min="0" onblur="atualizarTotal()">
@@ -362,11 +367,9 @@
 						<input name="B19" class="QUANT"  id="B19" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
-						<label class="nome">Brahma Duplo Malte 300ml</label>
+						<label class="nome">Brahma 300ml</label>
 						<input name="B20" class="QUANT"  id="B20" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
-					-->
-
 					<div class="conteiner-produto">
 						<label class="nome">Skol</label>
 						<input name="B21" class="QUANT"  id="B21" type="number"  min="0" onblur="atualizarTotal()">
@@ -375,7 +378,6 @@
 						<label class="nome">Red Bull</label>
 						<input name="B22" class="QUANT"  id="B22" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
-
                 </div>
 	<hr>
 

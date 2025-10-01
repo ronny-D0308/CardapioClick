@@ -8,6 +8,8 @@ include 'config.php';
 include 'funcoesPHP.php';
 include 'avisoDinamico.php';
 
+$dataatual = date('Y-m-d');
+
 session_start();
 if (!isset($_SESSION['usuario'])) {
     header('Location: Validacao.php');
@@ -29,6 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
     //$linha = mysqli_fetch_object($query_prod);
     //$QuantidadeBD = $linha->rom_Qtdunidade;
 
+    // CALCULO DO PREÇO UNITÁRIO
+    $Preco_unit = $Preco / $quantidade;
 
     // INICIA AS VERIFICAÇÕES PARA INSERÇÃO DE VALORES NO ESTOQUE
     if ($categoria == "Carnes") {
@@ -45,8 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
     }
 
 
-    $sql_insert = "INSERT INTO romaneio (rom_Idproduto, rom_Dataentrada, rom_Datavenci, rom_Quantidade, rom_Preco)
-                    VALUES ('$IdProd', NOW(), '$Datavenci', $quantidade, $valor)";
+    $sql_insert = "INSERT INTO romaneio (rom_Idproduto, rom_Dataentrada, rom_Datavenci, rom_Quantidade, rom_Preco, rom_precounitario)
+                    VALUES ('$IdProd', NOW(), '$Datavenci', $quantidade, $valor, $Preco_unit)";
         //echo $sql_insert;
     $query_insert = mysqli_query($conn, $sql_insert) or die(mysqli_error($conn));
 
@@ -287,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
 
             <span>
                 <label for="Datavenci">Data de Validade:</label>
-                <input type="date" name="Datavenci" id="Datavenci" value="<?=$dados['rom_Datavenci']?>">
+                <input type="date" name="Datavenci" id="Datavenci" value="<?= isset( $dados['rom_Datavenci'] ) ? $dados['rom_Datavenci'] : $dataatual ?>">
             </span>
 
             <div style="text-align: center; width: 100%">

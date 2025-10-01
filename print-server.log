@@ -7,7 +7,3 @@ Rotas disponíveis:
 - POST /imprimir
 - GET /health
 
-[2025-06-27T13:35:35.918Z] GET /health
-[2025-06-27T13:35:35.951Z] POST /imprimir
-[2025-06-27T16:16:13.082Z] GET /health
-[2025-06-27T16:16:13.088Z] POST /imprimir

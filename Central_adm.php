@@ -798,7 +798,7 @@
             <div class="container-tabela">
 
                 <!-- CARTÕES E GRÁFICO DE COLUNAS -->
-                <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 900px; gap: 10px;">
+                <div style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap; width: 920px; gap: 10px;">
 
                     <!--CARD FATURAMENTO TOTAL -->
                     <div class="Card">
@@ -1163,6 +1163,7 @@
     
 
     <!--------------------------------------------------- LOCAL DO GRÁFICO DE ATUALIDADES DA EMPRESA ------------------------------------------------------------>
+<!--    
     <section>
         <h1 class="title">Gestão de equipe</h1>
 
@@ -1188,9 +1189,12 @@
             </form>
         </div>
 
-        <div id="container" style="width:100%; height:600px;"></div> <!-- Área do gráfico -->
-
+        <div id="container" style="width:100%; height:600px;"></div>  
+        
+        Área do gráfico 
+                    -->
         <?php
+/*
             $labels = [];
             $dados = [];
 
@@ -1250,17 +1254,19 @@
 
                 $conn->close();
             }
+*/
             ?>
 
             <!-- AnyChart 3D -->
             <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
             <script src="https://cdn.anychart.com/releases/v8/js/anychart-cartesian-3d.min.js"></script>
 
-            <?php if ($tipoBusca !== "por-mesa") : ?>
+            <?php // if ($tipoBusca !== "por-mesa") : ?>
+<!--
                 <script>
-                    const labels = <?php echo json_encode($labels); ?>;
-                    const dados = <?php echo json_encode($dados); ?>;
-                    const tipoBusca = "<?php echo $tipoBusca ?? ''; ?>";
+                    const labels = <?php // echo json_encode($labels); ?>;
+                    const dados = <?php // echo json_encode($dados); ?>;
+                    const tipoBusca = "<?php // echo $tipoBusca ?? ''; ?>";
 
                         let titulo = "Resultado";
                     if (tipoBusca === "por-mesa") titulo = "Mesas Atendidas por Garçom";
@@ -1293,7 +1299,8 @@
                         });
                     }
                 </script>
-            <?php endif; ?>
+            <?php // endif; ?>
     </section>
+-->
 </body>
 </html>
