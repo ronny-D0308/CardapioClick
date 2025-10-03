@@ -173,6 +173,7 @@
 </head>
 
 <script type="text/javascript">
+	
 	document.addEventListener('DOMContentLoaded', function () {
 		document.querySelectorAll('.conteiner-produto').forEach(produto => {
 			const label = produto.querySelector('label');
@@ -305,7 +306,11 @@
 						<input name="B5" class="QUANT"  id="B5" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
-						<label class="nome">Suco</label>
+						<label class="nome"> Copo suco </label>
+						<input name="B6" class="QUANT"  id="B6" type="number"  min="0" onblur="atualizarTotal()">
+					</div>
+					<div class="conteiner-produto">
+						<label class="nome"> Jarra suco </label>
 						<input name="B6" class="QUANT"  id="B6" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
@@ -321,14 +326,14 @@
 						<label class="nome">Aquárius Fresh</label>
 						<input name="B9" class="QUANT"  id="B9" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					<div class="conteiner-produto">
+						<label class="nome">Coca zero</label>
+						<input name="B11" class="QUANT"  id="B11" type="number"  min="0" onblur="atualizarTotal()">
+					</div>
 					-->
 					<div class="conteiner-produto">
 						<label class="nome">Heineken 600ml</label>
 						<input name="B10" class="QUANT"  id="B10" type="number"  min="0" onblur="atualizarTotal()">
-					</div>
-					<div class="conteiner-produto">
-						<label class="nome">Coca zero</label>
-						<input name="B11" class="QUANT"  id="B11" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
 						<label class="nome">Heineken Long Neck</label>
@@ -357,21 +362,29 @@
 						<label class="nome">Ice Smirnoff</label>
 						<input name="B17" class="QUANT"  id="B17" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					<div class="conteiner-produto">
+						<label class="nome">Skol Beats</label>
+						<input name="B19" class="QUANT"  id="B19" type="number"  min="0" onblur="atualizarTotal()">
+					</div>
 					-->
 					<div class="conteiner-produto">
 						<label class="nome">Ice Cabaré</label>
 						<input name="B18" class="QUANT"  id="B18" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
-						<label class="nome">Skol Beats</label>
-						<input name="B19" class="QUANT"  id="B19" type="number"  min="0" onblur="atualizarTotal()">
+						<label class="nome">Brahma 600ml</label>
+						<input name="B20" class="QUANT"  id="B20" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
 						<label class="nome">Brahma 300ml</label>
 						<input name="B20" class="QUANT"  id="B20" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
-						<label class="nome">Skol</label>
+						<label class="nome">Skol 600ml</label>
+						<input name="B21" class="QUANT"  id="B21" type="number"  min="0" onblur="atualizarTotal()">
+					</div>
+					<div class="conteiner-produto">
+						<label class="nome">Skol 300ml</label>
 						<input name="B21" class="QUANT"  id="B21" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
@@ -450,7 +463,7 @@
 		<h1 class="itens">Petiscos:</h1>
 			<div class="conteiner_acomp">
 				<div class="conteiner-produto">
-					<label class="nome" for="acomp">Bolinha</label>
+					<label class="nome" for="acomp">Macaxeira</label>
 					<input class="QUANT"  type="number" id="P1" name="P1" min="0" onblur="atualizarTotal()">
 				</div>
 				<div class="conteiner-produto">
