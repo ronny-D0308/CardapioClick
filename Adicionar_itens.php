@@ -1,4 +1,6 @@
 <?php
+	include 'config.php';
+
 	session_start();
 
 	if(!isset($_SESSION['usuario'])) {
@@ -8,6 +10,10 @@
 	$usuario = $_SESSION["usuario"];
 
 	$comandaId = !empty($_GET['comandaId']) ? $_GET['comandaId'] : '';
+
+	$sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = $comandaId AND ven_Finalizada <> 'S'");
+	$result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	$nome_cliente = $result_nome_cliente->ven_Cliente;
 ?>
 
 <!DOCTYPE html>
@@ -225,14 +231,15 @@
         	<input type="hidden" name="itens_selecionados" id="itens_selecionados_input">
 			
 			<div class="informs">
-				<input id="nome_cliente" type="text" name="nome_cliente" placeholder="Cliente" color="white" maxlength="20" required>
-				<input id="nome_cliente" type="number" name="mesa" placeholder="Mesa" color="white" maxlength="20" value="<?=$comandaId?>">
+				<input id="nome_cliente" type="text" name="nome_cliente" placeholder="Cliente" color="white" maxlength="20" 
+							value="<?= isset($nome_cliente) ? $nome_cliente : "" ?>"  required>
+				<input id="nome_cliente" type="number" name="mesa" placeholder="Mesa" color="white" maxlength="20" value="<?= $comandaId ?>">
 				<!-- <input id="nome_cliente" type="text" name="garcon" placeholder="Garçom" color="white" maxlength="20" > -->
 			</div>
 
             
 			<!--CAMPOS DOS ESPETOS-->
-                <h1 class="itens">Espetos:</h1>
+                <h1 class="itens">Porções de carnes:</h1>
 
                 <div class="conteiner_espetos">
 
