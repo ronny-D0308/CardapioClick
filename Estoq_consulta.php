@@ -224,7 +224,7 @@ $usuario = $_SESSION['usuario'];
                         case 'bebida':
                             $Unid = "Unidades";
                             break;
-                        case 'pereciveis':
+                        case 'Porcoes':
                             $Unid = "Pct";
                             break;
                         case 'carnes':

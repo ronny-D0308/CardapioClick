@@ -164,10 +164,10 @@
                 <label for="categoria">Categoria:</label>
                 <select name="categoria" id="categoria">
                     <option value="Bebidas" > Bebida </option>
-                    <option value="Pereciveis" > Pereciveis </option>
-                    <option value="Limpeza" > Produtos de limpeza </option>
+                    <option value="Porcoes" > Porções </option>
+                    <!-- <option value="Limpeza" > Produtos de limpeza </option> -->
                     <option value="Carnes" > Carnes </option>
-                    <option value="Embalagens" > Embalagens </option>
+                    <!-- <option value="Embalagens" > Embalagens </option> -->
                     <option value="Bomboniere" > Bomboniere </option>
                 </select>
             </span>

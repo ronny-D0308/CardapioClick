@@ -102,10 +102,11 @@ $usuario = $_SESSION['usuario'];
                 <label for="categoria">Categoria:</label>
                 <select name="categoria">
                     <option value="Bebidas" > Bebidas </option>
-                    <option value="Periciveis" > Pericíveis </option>
+                    <option value="Porcoes" > Porções </option>
                     <option value="Carnes" > Carnes </option>
-                    <option value="Limpeza" > Produtos de limpeza </option>
-                    <option value="Embalagens" > Embalagens </option>
+                    <option value="Bomboniere" > Bomboniere </option>
+                    <!-- <option value="Limpeza" > Produtos de limpeza </option> -->
+                    <!-- <option value="Embalagens" > Embalagens </option> -->
                 </select>
             </span>
             

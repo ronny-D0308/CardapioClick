@@ -31,21 +31,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
     //$linha = mysqli_fetch_object($query_prod);
     //$QuantidadeBD = $linha->rom_Qtdunidade;
 
-    // CALCULO DO PREÇO UNITÁRIO
-    $Preco_unit = $Preco / $quantidade;
-
-    // INICIA AS VERIFICAÇÕES PARA INSERÇÃO DE VALORES NO ESTOQUE
-    if ($categoria == "Carnes") {
+    // INICIA AS VERIFICAÇÕES PARA INSERÇÃO DE VALORES NO ESTOQUE +  CALCULO DO PREÇO UNITÁRIO
+    if ($categoria == "Carnes" || $categoria == "Porcoes" ) {
         $valor = $Preco;
         $quantidade = $quantidade * 1000;
+        $Preco_unit = ($Preco / 1000) * 250;
     }
     else if ($categoria == "Bebidas") {
         $valor = $Preco;
         $quantidade = $quantidade;
+        $Preco_unit = $Preco / $quantidade;
     } 
     else {
         $valor = $Preco;
         $quantidade = $quantidade;
+        $Preco_unit = $Preco / $quantidade;
     }
 
 
@@ -152,37 +152,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
     </style>
 
     <script>
-    function buscarProd() {
-        const busca = document.getElementById("buscaProd").value;
-        const url = window.location.pathname + "?buscaProd=" + encodeURIComponent(busca);
-        window.location.href = url;
-    }
-    
-    function alterarQuantidade(valor) {
-        const input = document.getElementById('quantidade');
-        let atual = parseInt(input.value) || 0;
-        atual += valor;
-        if (atual < 0) atual = 0;
-        input.value = atual;
-    }
-    
-    function formatarDataParaInput(dataBR) {
-        const [dia, mes, ano] = dataBR.split('/');
-        return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
-    }
-    
-    function entradaProd(botao) {
-
-        const linhaSelecionada = botao.closest("tr");
-        const id = linhaSelecionada.getAttribute("data-id");
-
-        const colunas = linhaSelecionada.querySelectorAll("td");
-        const categoria = colunas[1].innerText;
-    
-        // Redireciona para a mesma página com o ID na URL
-        window.location.href = window.location.pathname + "?entrada=S&id=" + encodeURIComponent(id) + "&categoria=" + encodeURIComponent(categoria);
-    }
+        function buscarProd() {
+            const busca = document.getElementById("buscaProd").value;
+            const url = window.location.pathname + "?buscaProd=" + encodeURIComponent(busca);
+            window.location.href = url;
+        }
         
+        function alterarQuantidade(valor) {
+            const input = document.getElementById('quantidade');
+            let atual = parseInt(input.value) || 0;
+            atual += valor;
+            if (atual < 0) atual = 0;
+            input.value = atual;
+        }
+        
+        function formatarDataParaInput(dataBR) {
+            const [dia, mes, ano] = dataBR.split('/');
+            return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+        }
+        
+        function entradaProd(botao) {
+
+            const linhaSelecionada = botao.closest("tr");
+            const id = linhaSelecionada.getAttribute("data-id");
+
+            const colunas = linhaSelecionada.querySelectorAll("td");
+            const categoria = colunas[1].innerText;
+        
+            // Redireciona para a mesma página com o ID na URL
+            window.location.href = window.location.pathname + "?entrada=S&id=" + encodeURIComponent(id) + "&categoria=" + encodeURIComponent(categoria);
+        }
+            
     </script>
 </head>
 
