@@ -50,7 +50,7 @@
                     avisoDinamico("Senha ou usuário inválida!", "#CF1414");
                     echo "
                         <div style='width:100%; text-align: center; margin-top: 10%;' >
-                            <h3> <a href='Validacao.php'> Clique aqui </a> para voltar </h3>
+                            <h3> <a href='index.php'> Clique aqui </a> para voltar </h3>
                         </div>";
                 }
             
@@ -58,7 +58,7 @@
                 include 'avisoDinamico.php';
                 avisoDinamico("Usuário sem acesso", "#CF1414");
                 echo "<div style='width:100%; text-align: center; margin-top: 10%;' >
-                        <h3> <a href='Validacao.php'> Clique aqui </a> para voltar </h3>
+                        <h3> <a href='index.php'> Clique aqui </a> para voltar </h3>
                       </div>";
             }
             $stmt->close();

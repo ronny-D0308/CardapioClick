@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['Valorfechamento'])) {
     if ($query) {
         include 'avisoDinamico.php';
         avisoDinamico("Caixa fechado", "#01B712");
-        header("Refresh:2; url=Validacao.php");
+        header("Refresh:2; url=index.php");
     } else {
         include 'avisoDinamico.php';
         avisoDinamico("Erro ao fechar o caixa", "#CB0606");

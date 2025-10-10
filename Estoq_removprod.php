@@ -5,7 +5,7 @@
     
     session_start();
     if(!isset($_SESSION['usuario'])) {
-        header('Location: Validacao.php');
+        header('Location: index.php');
         exit;
     }
     $usuario = $_SESSION['usuario'];
