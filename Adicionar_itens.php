@@ -156,6 +156,18 @@
 			border: 0;
 			cursor: pointer;
 		}
+		#butao_enviar_manual{
+			height: 40px;
+			width: auto;
+			background-color: #733309;
+			color: aliceblue;
+			font-size: 20px;
+			border-radius: 10px;
+			font-weight: bolder;
+			justify-content: center;
+			border: 0;
+			cursor: pointer;
+		}
 		#total {
 			margin: 0 auto;
 		}
@@ -255,6 +267,47 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function adicionarManual() {
+    const item = document.querySelector('input[name="Man_item"]').value.trim();
+    const quant = document.querySelector('input[name="Man_qtd"]').value;
+	const preco = parseFloat(document.querySelector('input[name="Man_preco"]').value);
+    const comandaId = <?= $comandaId ?>; // Certifique-se que $comandaId está definido no PHP
+    const nomeCliente = document.querySelector('input[name="nome_cliente"]').value.trim(); // ✅ Novo
+
+
+    if (!item || preco <= 0) {
+        alert('Preencha corretamente o item e preço do item.');
+        return;
+    }
+
+    fetch('adicionar_manual.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `Man_item=${encodeURIComponent(item)}&Man_qtd=${quant}&Man_preco=${preco}&comandaId=${comandaId}&nome_cliente=${encodeURIComponent(nomeCliente)}`
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.erro) {
+            alert('Erro: ' + data.mensagem);
+        } else {
+            // alert(data.mensagem);
+
+            // Atualizar lista de itens (opcional)
+            console.log('Itens da comanda:', data.itens);
+
+            // Atualizar total no front-end
+            atualizarTotal(data.total);
+
+            // Redirecionar se necessário
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            }
+        }
+    })
+    .catch(err => alert('Erro ao adicionar item: ' + err));
+}
+
 </script>
 
 
@@ -338,18 +391,18 @@ document.addEventListener('DOMContentLoaded', function () {
 						<input name="B1" class="QUANT"  id="B1" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
-						<label class="nome">Coca-cola 2L</label>
-						<input name="B25" class="QUANT"  id="B25" type="number"  min="0" onblur="atualizarTotal()">
-					</div>
-					<div class="conteiner-produto">
 						<label class="nome">Guaraná 1LT</label>
 						<input name="B2" class="QUANT"  id="B2" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
-					<!--
 					<div class="conteiner-produto">
-						<label class="nome">Devassa</label>
+						<label class="nome">Coca 600ml</label>
 						<input name="B3" class="QUANT"  id="B3" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					<div class="conteiner-produto">
+						<label class="nome">Coca-cola 2L</label>
+						<input name="B25" class="QUANT"  id="B25" type="number"  min="0" onblur="atualizarTotal()">
+					</div>
+					<!--
 					<div class="conteiner-produto">
 						<label class="nome">Pitchulinha</label>
 						<input name="B4" class="QUANT"  id="B4" type="number"  min="0" onblur="atualizarTotal()">
@@ -380,11 +433,11 @@ document.addEventListener('DOMContentLoaded', function () {
 						<label class="nome">Aquárius Fresh</label>
 						<input name="B9" class="QUANT"  id="B9" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
+					-->
 					<div class="conteiner-produto">
-						<label class="nome">Coca zero</label>
+						<label class="nome">Baly</label>
 						<input name="B11" class="QUANT"  id="B11" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
-					-->
 					<div class="conteiner-produto">
 						<label class="nome">Heineken 600ml</label>
 						<input name="B10" class="QUANT"  id="B10" type="number"  min="0" onblur="atualizarTotal()">
@@ -498,7 +551,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				
 				<hr>
+
 			<!--CAMPOS DOS ACOMPANHANTES-->	
+
+				<h1 class="itens">Carnes:</h1>
+				<div class="conteiner_acomp">
+					<div class="conteiner-produto">
+						<label class="nome" for="acomp">Gado</label>
+						<input class="QUANT"  type="number" id="C1" name="C1" min="0" placeholder="gramas" onblur="atualizarTotal()">
+					</div>
+					<div class="conteiner-produto">
+						<label class="nome" for="acomp">Porco</label>
+						<input class="QUANT"  type="number" id="C2" name="C2" min="0" placeholder="gramas" onblur="atualizarTotal()">
+					</div>
+					<div class="conteiner-produto">
+						<label class="nome" for="acomp">Frango</label>
+						<input class="QUANT"  type="number" id="C3" name="C3" min="0" placeholder="gramas" onblur="atualizarTotal()">
+					</div>
+					<div class="conteiner-produto">
+						<label class="nome" for="acomp">Linguiça</label>
+						<input class="QUANT"  type="number" id="C4" name="C4" min="0" placeholder="gramas" onblur="atualizarTotal()">
+					</div>
+				</div>
+				
+				<hr>
+
+
+				<!--CAMPOS DOS ACOMPANHANTES-->	
 
 				<h1 class="itens">Acompanhante:</h1>
 				<div class="conteiner_acomp">
@@ -533,6 +612,29 @@ document.addEventListener('DOMContentLoaded', function () {
 					</div>
 				</div>
 
+			<!--CAMPOS DOS DE ADIÇÃO MANUAL -->	
+
+				<h1 class="itens">Item manual:</h1>
+				<div class="conteiner_acomp">
+					<div class="conteiner-produto" style="display: flex; flex-direction: row; gap: 30px; width: auto; justify-content: center;">
+						<span>
+							<h3> Nome: </h3>
+							<input class="QUANT" type="text" name="Man_item" style="width: 250px">
+						</span>
+						<span>
+							<h3> Quantidade: </h3>
+							<input class="QUANT"  type="number" id="Man_qtd" name="Man_qtd" min="0">
+						</span>
+						<span>
+							<h3> Preço: </h3>
+							<input class="QUANT"  type="number" id="Man_preco" name="Man_preco" min="0">
+						</span>
+						<br>
+						<button id="butao_enviar_manual" type="button" onclick="adicionarManual()">Adicionar manualmente</button>
+					</div>
+				</div>
+				<br><br><br><br>
+
 
 				<h3 id="total">Total: R$ </h3>
 				<input type="hidden" name="total" id="total_input">
@@ -555,11 +657,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		const precos = {
 			E1: 20.00, E2: 40.00, E3: 60.00, E4: 80.00, E5: 100.00, E6: 6.00, E7: 8.00, E8: 15.00, E9: 17.00,
 
-			B1: 5.00, B2: 8.00, B3: 5.00, B4: 3.50, B5: 5.50, B6: 6.00, B7: 3.00, B8: 2.50, B9: 3.00,
-			B10: 12.00, B11: 6.00, B12: 10.00, B13: 10.50, B14: 9.50, B15: 9.00, B16: 10.00, B17: 8.00, B18: 10.00, 
-			B19: 9.00, B20: 10.00, B21: 5.00, B22: 10.00, B23: 5.00, B24: 13.00, B25: 15.00, B26: 10.00,
+			B1: 10.00, B2: 8.00, B3: 7.00, B4: 3.50, B5: 5.00, B6: 3.00, B7: 3.00, B8: 2.00, B9: 3.00,
+			B10: 17.00, B11: 13.00, B12: 10.00, B13: 10.00, B14: 9.50, B15: 10.00, B16: 10.00, B17: 8.00, B18: 10.00, 
+			B19: 9.00, B20: 12.00, B21: 5.00, B22: 10.00, B23: 5.00, B24: 13.00, B25: 13.00, B26: 10.00,
 
 			W1: 12.00, W2: 10.00, W3: 10.00, W4: 10.00, W5: 15.00, W6: 10.00, W7: 10.00, W8: 2.00, W9: 10.00, W10: 4.00,
+
+			C1:60.00, C2: 50.00, C3: 40.00, C4: 30.00,
 
 			A1:8.00, A2: 9.00,
 
@@ -567,19 +671,25 @@ document.addEventListener('DOMContentLoaded', function () {
 		};
 
 
-        function atualizarTotal() {
-			let total = 0;
-
-			document.querySelectorAll(".QUANT").forEach(input => {
-				let id = input.id;
-				let quantidade = parseFloat(input.value) || 0; // Garante que valores vazios sejam considerados como 0
-				if (precos[id]) {
-					total += quantidade * precos[id];
-				}
-			});
-
-			document.getElementById("total").textContent = `Total: R$ ${total.toFixed(2)}`;
+		function atualizarTotal() {
+		    let total = 0;
+		
+		    document.querySelectorAll(".QUANT").forEach(input => {
+		        let id = input.id;
+		        let quantidade = parseFloat(input.value) || 0;
+		        let preco = precos[id] || 0;
+			
+		        // ✅ Se for carne (C1, C2, C3, C4), o valor digitado é em gramas
+		        if (id.startsWith("C")) {
+		            quantidade = quantidade / 1000; // converte gramas para kg
+		        }
+			
+		        total += quantidade * preco;
+		    });
+		
+		    document.getElementById("total").textContent = `Total: R$ ${total.toFixed(2)}`;
 		}
+
 
 		function atualizarHiddenTotal() {
 			let totalText = document.getElementById("total").innerText;
@@ -590,33 +700,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		// FUNÇÃO JAVASCRIPT QUE CARREGA OS ITENS E SEUS VALORES 
 		function getItensSelecionados() {
-			const itensSelecionados = [];
-
-			document.querySelectorAll('.conteiner-produto').forEach(produto => {
-				const input = produto.querySelector('input');
-				const label = produto.querySelector('label') || produto.querySelector('h2');
-
-				if (input && label) {
-					let quantidade = parseFloat(input.value);
-					if (quantidade > 0) {
-						const id = input.id;
-						const preco_unitario = precos[id] || 0;
-						const subtotal = quantidade * preco_unitario;
-
-						itensSelecionados.push({
-							nome: label.textContent.trim(),
-							quantidade: quantidade,
-							preco_unitario: preco_unitario,
-							subtotal: subtotal
-						});
-					}
-				}
-			});
-
-			console.log("Itens com valores:", itensSelecionados); // Debug no console
-
-			document.getElementById("itens_selecionados_input").value = JSON.stringify(itensSelecionados);
+		    const itensSelecionados = [];
+		
+		    document.querySelectorAll('.conteiner-produto').forEach(produto => {
+		        const input = produto.querySelector('input');
+		        const label = produto.querySelector('label') || produto.querySelector('h2');
+			
+		        if (input && label) {
+		            let quantidade = parseFloat(input.value);
+		            if (quantidade > 0) {
+		                const id = input.id;
+		                const preco_unitario = precos[id] || 0;
+					
+		                // ✅ Converte gramas em kg para carnes
+		                let quantidade_convertida = id.startsWith("C") ? quantidade / 1000 : quantidade;
+		                const subtotal = quantidade_convertida * preco_unitario;
+					
+		                itensSelecionados.push({
+		                    nome: label.textContent.trim(),
+		                    quantidade: quantidade_convertida,
+		                    preco_unitario: preco_unitario,
+		                    subtotal: subtotal
+		                });
+		            }
+		        }
+		    });
+		
+		    document.getElementById("itens_selecionados_input").value = JSON.stringify(itensSelecionados);
 		}
+
 
 	</script>
 			

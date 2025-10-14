@@ -4,69 +4,33 @@ header('Content-Type: application/json');
 
 $response = [];
 
-// Obtém o venSeq e valida
 $venMesa = isset($_GET['venMesa']) ? (int)$_GET['venMesa'] : 0;
-$formapag = isset($_GET['formapag']) ? $_GET['formapag'] : '';
-$itens = json_decode(file_get_contents('php://input'), true)['itens'] ?? [];
+$data = json_decode(file_get_contents('php://input'), true);
+$itens = $data['itens'] ?? [];
+$pagamentos = $data['pagamentos'] ?? [];
 
-if (!$venMesa) {
-    $response['erro'] = 'ID da comanda (venMesa) inválido.';
+if (!$venMesa || empty($pagamentos)) {
+    $response['erro'] = 'ID da comanda ou pagamentos inválidos.';
     echo json_encode($response);
     exit;
 }
 
-// Verifica conexão
-if (!$conn) {
-    $response['erro'] = 'Erro na conexão com o banco de dados.';
-    echo json_encode($response);
-    exit;
-}
+// Atualiza a venda como finalizada, armazenando os pagamentos em JSON
+$pagamentosJSON = json_encode($pagamentos, JSON_UNESCAPED_UNICODE);
 
-// Verifica se a venda existe
-$sql = "SELECT ven_Seq FROM vendas WHERE ven_Mesa = ? AND ven_Finalizada <> 'S' ";
-$stmt = $conn->prepare($sql);
-if (!$stmt) {
-    $response['erro'] = 'Erro ao preparar SELECT: ' . $conn->error;
-    echo json_encode($response);
-    exit;
-}
-
-$stmt->bind_param("i", $venMesa);
-$stmt->execute();
-$stmt->store_result();
-
-if ($stmt->num_rows === 0) {
-    // Venda não encontrada
-    $response['erro'] = 'Nenhuma comanda encontrada com esse ID.';
-    echo json_encode($response);
-    $stmt->close();
-    $conn->close();
-    exit;
-}
-$stmt->close();
-
-// Atualiza a venda como finalizada
-$sql_upd = "UPDATE vendas SET ven_Finalizada = 'S', ven_Formapag = '$formapag' WHERE ven_Mesa = ? AND ven_Finalizada <> 'S'";
+$sql_upd = "UPDATE vendas SET ven_Finalizada = 'S', ven_Formapag = ? WHERE ven_Mesa = ? AND ven_Finalizada <> 'S'";
 $stmt_upd = $conn->prepare($sql_upd);
-if (!$stmt_upd) {
-    $response['erro'] = 'Erro ao preparar UPDATE: ' . $conn->error;
-    echo json_encode($response);
-    exit;
-}
+$stmt_upd->bind_param("si", $pagamentosJSON, $venMesa);
 
-$stmt_upd->bind_param("i", $venMesa);
-if (!$stmt_upd->execute()) {
-    $response['erro'] = 'Erro ao fechar a comanda.';
-    echo json_encode($response);
-    $stmt_upd->close();
-    $conn->close();
-    exit;
+if ($stmt_upd->execute()) {
+    $response['sucesso'] = true;
+} else {
+    $response['erro'] = 'Erro ao atualizar a comanda: ' . $stmt_upd->error;
 }
 
 $stmt_upd->close();
 $conn->close();
 
-$response['sucesso'] = true;
-$response['mensagem'] = 'Comanda fechada e romaneio atualizado com sucesso.';
 echo json_encode($response);
+
 ?>

@@ -13,24 +13,18 @@ if ($mesa <= 0 || empty($itemNome)) {
     exit;
 }
 
-// Buscar ID do produto
-$sqlProduto = "SELECT etq_Id, etq_Categoria FROM estoque WHERE LOWER(etq_Nome) LIKE LOWER(?)";
+// Tenta buscar o produto no estoque, mas não aborta se não existir
+$sqlProduto = "SELECT etq_Id, etq_Categoria FROM estoque WHERE LOWER(etq_Nome) LIKE LOWER(?) LIMIT 1";
 $stmt = $conn->prepare($sqlProduto);
 $nomeLike = "%$itemNome%";
 $stmt->bind_param("s", $nomeLike);
 $stmt->execute();
 $res = $stmt->get_result();
-$row = $res->fetch_assoc();
+$rowProduto = $res->fetch_assoc();
 $stmt->close();
 
-if (!$row) {
-    $response['erro'] = "Item não encontrado no estoque.";
-    echo json_encode($response);
-    exit;
-}
-
-$idProduto = $row['etq_Id'];
-$Categoria = $row['etq_Categoria'];
+$idProduto = $rowProduto['etq_Id'] ?? null; // Pode ser null se não existir
+$Categoria = $rowProduto['etq_Categoria'] ?? null;
 
 // Buscar vendas não finalizadas da mesa
 $sql = "SELECT ven_Seq, ven_Itens, ven_Valor FROM vendas WHERE ven_Mesa = ? AND ven_Finalizada <> 'S'";
@@ -72,27 +66,25 @@ while ($row = $result->fetch_assoc()) {
         $update->execute();
         $update->close();
 
-        // Devolve 1 unidade ao estoque (romaneio)
-        $sqlRom = "SELECT rom_Id, rom_Quantidade FROM romaneio WHERE rom_Idproduto = ? LIMIT 1";
-        $stmtRom = $conn->prepare($sqlRom);
-        $stmtRom->bind_param("i", $idProduto);
-        $stmtRom->execute();
-        $stmtRom->bind_result($romId, $qtdAtual);
-        if ($stmtRom->fetch()) {
-            $stmtRom->close();
+        // Atualiza estoque apenas se o produto existir
+        if ($idProduto) {
+            $sqlRom = "SELECT rom_Id, rom_Quantidade FROM romaneio WHERE rom_Idproduto = ? LIMIT 1";
+            $stmtRom = $conn->prepare($sqlRom);
+            $stmtRom->bind_param("i", $idProduto);
+            $stmtRom->execute();
+            $stmtRom->bind_result($romId, $qtdAtual);
+            if ($stmtRom->fetch()) {
+                $stmtRom->close();
 
-            if ($Categoria == "Carnes") {
-                $novaQtd = $qtdAtual + 250;
+                $novaQtd = ($Categoria == "Carnes") ? $qtdAtual + 250 : $qtdAtual + 1;
+
+                $updateRom = $conn->prepare("UPDATE romaneio SET rom_Quantidade = ? WHERE rom_Id = ?");
+                $updateRom->bind_param("ii", $novaQtd, $romId);
+                $updateRom->execute();
+                $updateRom->close();
             } else {
-                $novaQtd = $qtdAtual + 1;
+                $stmtRom->close();
             }
-
-            $updateRom = $conn->prepare("UPDATE romaneio SET rom_Quantidade = ? WHERE rom_Id = ?");
-            $updateRom->bind_param("ii", $novaQtd, $romId);
-            $updateRom->execute();
-            $updateRom->close();
-        } else {
-            $stmtRom->close();
         }
 
         break; // Atualiza apenas uma venda

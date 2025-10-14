@@ -17,6 +17,22 @@ function obterComponentesProduto($nomeProduto) {
         '1 Pessoa' => [
             ['nome' => 'Arroz', 'quantidade' => 300],
             ['nome' => 'Gado', 'quantidade' => 200]
+        ],
+        '2 Pessoa' => [
+            ['nome' => 'Arroz', 'quantidade' => 600],
+            ['nome' => 'Gado', 'quantidade' => 400]
+        ],
+        '3 Pessoa' => [
+            ['nome' => 'Arroz', 'quantidade' => 900],
+            ['nome' => 'Gado', 'quantidade' => 600]
+        ],
+        '4 Pessoa' => [
+            ['nome' => 'Arroz', 'quantidade' => 1200],
+            ['nome' => 'Gado', 'quantidade' => 800]
+        ],
+        '5 Pessoa' => [
+            ['nome' => 'Arroz', 'quantidade' => 1500],
+            ['nome' => 'Gado', 'quantidade' => 1000]
         ]
     ];
     

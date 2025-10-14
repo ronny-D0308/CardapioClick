@@ -344,7 +344,7 @@
 	        <h2>Menu</h2>
 	        <ul>
 	            <!-- <li><button id="botao-vale">Fazer vale</button></li> -->
-	            <li><a href="Validacao.php">sair</a></li>
+	            <li><a href="index.php">sair</a></li>
 	        </ul>
 	    </div>
 	</div>
@@ -352,50 +352,253 @@
   <div class="conteiner">
     <div class="comandas" id="1">
       <h1>Comanda: 1</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 1 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="2">
       <h1>Comanda: 2</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 2 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="3">
       <h1>Comanda: 3</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 3 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="4">
       <h1>Comanda: 4</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 4 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="5">
       <h1>Comanda: 5</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 5 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="6">
       <h1>Comanda: 6</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 6 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="7">
       <h1>Comanda: 7</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 7 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="8">
       <h1>Comanda: 8</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 8 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="9">
       <h1>Comanda: 9</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 9 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="10">
       <h1>Comanda: 10</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 10 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <div class="comandas" id="11">
       <h1>Comanda: 11</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 11 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
-
     <div class="comandas" id="12">
       <h1>Comanda: 12</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 12 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="13">
+      <h1>Comanda: 13</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 13 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="14">
+      <h1>Comanda: 14</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 14 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="15">
+      <h1>Comanda: 15</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 15 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="16">
+      <h1>Comanda: 16</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 16 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="17">
+      <h1>Comanda: 17</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 17 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="18">
+      <h1>Comanda: 18</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 18 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="19">
+      <h1>Comanda: 19</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 19 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
+    </div>
+    <div class="comandas" id="20">
+      <h1>Comanda: 20</h1>
+      <br>
+      <h3>
+        <?php
+              $sql_nome_cliente = mysqli_query($conn, "SELECT ven_Cliente FROM vendas WHERE ven_Mesa = 20 AND ven_Finalizada <> 'S'");
+	            $result_nome_cliente = mysqli_fetch_object($sql_nome_cliente);
+	            $nome_cliente = $result_nome_cliente->ven_Cliente;
+              echo $nome_cliente ?? '';
+        ?>
+      </h3>
     </div>
 
     <!-- Replicar para as outras comandas... -->
@@ -528,6 +731,14 @@
       comanda10: [],
       comanda11: [],
       comanda12: [],
+      comanda13: [],
+      comanda14: [],
+      comanda15: [],
+      comanda16: [],
+      comanda17: [],
+      comanda18: [],
+      comanda19: [],
+      comanda20: [],
     };
 
     comandas.forEach(comanda => {
@@ -697,96 +908,130 @@
       //menuModal.style.display = 'none'; // Fecha o modal de cardápio
     });
 
-    closeComandaBtn.addEventListener('click', function () {
-      const venMesa = parseInt(document.getElementById('venMesa').value);
-      
-      // Coleta os dados dos itens da comanda
-      const itens = itensDaComandaAtual.map(item => ({
-        nome: item.nome,
-        quantidade: item.quantidade
-      }));
+closeComandaBtn.addEventListener('click', function () {
+    const venMesa = parseInt(document.getElementById('venMesa').value);
 
-      if (confirm("Deseja realmente finalizar e imprimir esta comanda?")) {
+    if (confirm("Deseja realmente finalizar e imprimir esta comanda?")) {
 
-          // Cria o overlay
-          const overlay = document.createElement('div');
-          overlay.style.position = 'fixed';
-          overlay.style.top = '0';
-          overlay.style.left = '0';
-          overlay.style.width = '100%';
-          overlay.style.height = '100%';
-          overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-          overlay.style.zIndex = '999'; // Abaixo do modal, acima do resto da página
-          document.body.appendChild(overlay);
+        // Overlay escuro
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        overlay.style.zIndex = '999';
+        document.body.appendChild(overlay);
 
-              // Cria um modal simples com select para forma de pagamento
-          const modal = document.createElement('div');
-          modal.style.position = 'fixed';
-          modal.style.top = '50%';
-          modal.style.left = '50%';
-          modal.style.transform = 'translate(-50%, -50%)';
-          modal.style.backgroundColor = 'white';
-          modal.style.padding = '20px';
-          modal.style.border = '1px solid #ccc';
-          modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-          modal.style.zIndex = '1000';
-          modal.style.display = 'flex';
-          modal.style.flexDirection = 'column'; // Organiza os itens em coluna
-          modal.style.justifyContent = 'center'; // Centraliza horizontalmente os itens internos
-          modal.style.alignItems = 'center'; // Corrige o erro de digitação, centraliza verticalmente os itens internos
-          modal.style.width = '300px'; // Define uma largura fixa para consistência
-          modal.style.height = '250px';
-          modal.style.borderRadius = '8px'; // Opcional: bordas arredondadas para melhor estética
-          modal.innerHTML = `
-              <h4 style='color:black;'>Selecione a Forma de Pagamento</h4>
-              <select id="formaPagamento">
-                  <option value="">Selecione...</option>
-                  <option value="dinheiro">Dinheiro</option>
-                  <option value="credito">Cartão de Crédito</option>
-                  <option value="debito">Cartão de Débito</option>
-                  <option value="pix">PIX</option>
-              </select>
-              <br><br>
-              <button class='botoesformapag' onclick="confirmarPagamento()">Confirmar</button>
-              <button class='botoesformapag' onclick="cancelarPagamento()">Cancelar</button>
-          `;
-          document.body.appendChild(modal);
+        // Modal de pagamentos
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '50%';
+        modal.style.left = '50%';
+        modal.style.transform = 'translate(-50%, -50%)';
+        modal.style.backgroundColor = 'white';
+        modal.style.padding = '20px';
+        modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+        modal.style.zIndex = '1000';
+        modal.style.display = 'flex';
+        modal.style.flexDirection = 'column';
+        modal.style.alignItems = 'center';
+        modal.style.width = '350px';
+        modal.style.borderRadius = '8px';
 
-          // Funções globais para confirmar ou cancelar (devem ser acessíveis no escopo da página)
-          window.confirmarPagamento = function() {
-              const formaPag = document.getElementById('formaPagamento').value;
-              if (formaPag) {
+        modal.innerHTML = `
+            <h4 style='color:black;'>Forma(s) de Pagamento</h4>
+            <div id="pagamentos-container" style="width:100%; margin-bottom:10px;">
+                <div class="pagamento-item" style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <select class="forma-pagamento" style="flex:1; margin-right:5px;">
+                        <option value="">Selecione...</option>
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="credito">Cartão de Crédito</option>
+                        <option value="debito">Cartão de Débito</option>
+                        <option value="pix">PIX</option>
+                    </select>
+                    <input type="number" class="valor-pagamento" placeholder="Valor" style="flex:1;">
+                </div>
+            </div>
+            <button id="add-payment-method" class="botoesformapag" style="margin-bottom:10px;">Adicionar método</button>
+            <button class='botoesformapag' id="confirmarPagamento">Confirmar</button>
+            <button class='botoesformapag' id="cancelarPagamento">Cancelar</button>
+        `;
+        document.body.appendChild(modal);
 
-                  // Envia os dados para o servidor
-                  fetch(`fechar_comanda.php?venMesa=${venMesa}&formapag=${encodeURIComponent(formaPag)}`, {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ itens })
-                  })
-                  .then(response => response.json())
-                  .then(data => {
-                    if (data.sucesso) {
-                      modal.style.display = 'none';
-                      window.location.reload(); // Recarrega a página corretamente
-                    } else {
-                      alert('Erro ao fechar a comanda: ' + data.erro);
-                    }
-                  })
-                  .catch(error => {
-                    console.error('Erro na requisição:', error);
-                  });
-              }
-          }
+        // Adicionar novo método de pagamento
+        document.getElementById('add-payment-method').addEventListener('click', () => {
+            const container = document.getElementById('pagamentos-container');
+            const div = document.createElement('div');
+            div.classList.add('pagamento-item');
+            div.style.display = 'flex';
+            div.style.justifyContent = 'space-between';
+            div.style.marginBottom = '5px';
+            div.innerHTML = `
+                <select class="forma-pagamento" style="flex:1; margin-right:5px;">
+                    <option value="">Selecione...</option>
+                    <option value="dinheiro">Dinheiro</option>
+                    <option value="credito">Cartão de Crédito</option>
+                    <option value="debito">Cartão de Débito</option>
+                    <option value="pix">PIX</option>
+                </select>
+                <input type="number" class="valor-pagamento" placeholder="Valor" style="flex:1;">
+            `;
+            container.appendChild(div);
+        });
 
-          window.cancelarPagamento = function() {
-              document.body.removeChild(modal);
-              //alert("Operação cancelada.");
-              window.location.reload();
-          };
-      }
-    });
+        // Confirmar pagamento
+        document.getElementById('confirmarPagamento').addEventListener('click', () => {
+            const itens = itensDaComandaAtual.map(item => ({
+                nome: item.nome,
+                quantidade: item.quantidade
+            }));
+
+            const pagamentos = [];
+            const selects = modal.querySelectorAll('.forma-pagamento');
+            const valores = modal.querySelectorAll('.valor-pagamento');
+
+            for (let i = 0; i < selects.length; i++) {
+                const forma = selects[i].value;
+                const valor = parseFloat(valores[i].value) || 0;
+                if (forma && valor > 0) {
+                    pagamentos.push({ forma, valor });
+                }
+            }
+
+            if (pagamentos.length === 0) {
+                alert("Informe pelo menos um método de pagamento válido.");
+                return;
+            }
+
+            // Envia dados para o PHP
+            fetch(`fechar_comanda.php?venMesa=${venMesa}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ itens, pagamentos })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.sucesso) {
+                    document.body.removeChild(modal);
+                    document.body.removeChild(overlay);
+                    window.location.reload();
+                } else {
+                    alert('Erro ao fechar comanda: ' + data.erro);
+                }
+            })
+            .catch(err => console.error(err));
+        });
+
+        // Cancelar
+        document.getElementById('cancelarPagamento').addEventListener('click', () => {
+            document.body.removeChild(modal);
+            document.body.removeChild(overlay);
+        });
+    }
+});
+
 
     // Selecionando os elementos
     const toggleButton = document.querySelector('.toggle-button');

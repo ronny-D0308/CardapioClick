@@ -35,6 +35,7 @@
     } elseif ($flag == 'Deletacomanda') {
         $mesa = intval($_POST['mesa'] ?? $_GET['mesa'] ?? 0);
         $delete = "DELETE FROM vendas WHERE ven_Mesa = $mesa AND ven_Finalizada <> 'S'";
+        // echo $delete;
         $querydelete = mysqli_query($conn, $delete);
     }
 ?>
@@ -255,12 +256,12 @@
         /*------ STYLE PARA A ANÁLISE DE VENDAS -------*/
         .container-tabela {
             margin: 0 auto;
-            width: 95%;
+            width: 100%;
             background: rgba(0, 0, 0, 0.4);
             border-radius: 15px 15px 0 0;
             display: flex;
             flex-direction: row;
-            flex-wrap: wrap;
+            /*flex-wrap: wrap;*/
             justify-content: space-around;
             padding: 10px;
         }
@@ -290,7 +291,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 5px;
+            padding: 3px;
         }
         p {
             font-size: 12px;
@@ -398,7 +399,7 @@
                     <div class="icon"> <a href="Estoque_main.php"> Estoque </a> </div>
                     <div class="icon"> <a href="Cadastro.php"> Cadastro </a> </div>
                     <div class="icon"> <a href="Pedidosremov.php"> Pedidos removidos </a> </div>
-                    <div class="icon"> <a href="Validacao.php"> Sair </a> </div>
+                    <div class="icon"> <a href="index.php"> Sair </a> </div>
                 </div>
             </div>
 
@@ -597,7 +598,7 @@
                                     return response.text();
                                 })
                                 .then(() => {
-                                    imprimirComanda();
+                                    // imprimirComanda();
                                     if (!sessionStorage.getItem('recarregado')) {
                                         sessionStorage.setItem('recarregado', 'true');
                                         window.location.reload();
@@ -697,65 +698,65 @@
                     janelaImpressao.print();
                     janelaImpressao.close();
 
-                    imprimirComanda();
+                    // imprimirComanda();
                 }
 
-                async function imprimirComanda() {
-                    try {
-                        // Verifica se o servidor está respondendo
-                        const isServerRunning = await fetch('http://localhost:3000/health', {
-                            method: 'GET',
-                            cache: 'no-store'
-                        }).then(res => res.ok).catch(() => false);
-                    
-                        if (!isServerRunning) {
-                            // Tenta iniciar o servidor
-                            const startResponse = await fetch('http://localhost/start-print-server.php', {
-                                method: 'GET',
-                                cache: 'no-store'
-                            });
+                //async function imprimirComanda() {
+                //    try {
+                //        // Verifica se o servidor está respondendo
+                //        const isServerRunning = await fetch('http://localhost:3000/health', {
+                //            method: 'GET',
+                //            cache: 'no-store'
+                //        }).then(res => res.ok).catch(() => false);
+                //    
+                //        if (!isServerRunning) {
+                //            // Tenta iniciar o servidor
+                //            const startResponse = await fetch('http://localhost/start-print-server.php', {
+                //                method: 'GET',
+                //                cache: 'no-store'
+                //            });
 
-                            if (!startResponse.ok) {
-                                throw new Error('Servidor offline - usando impressão alternativa');
-                            }
+                //            if (!startResponse.ok) {
+                //                throw new Error('Servidor offline - usando impressão alternativa');
+                //            }
 
-                            // Aguarda 3 segundos para o servidor iniciar
-                            await new Promise(resolve => setTimeout(resolve, 3000));
-                        }
-                    
-                        // Continua com a impressão normal
-                        const colunas = linhaSelecionada.querySelectorAll("td");
-                        const comanda = {
-                            mesa: linhaSelecionada.getAttribute('data-id'),
-                            cliente: colunas[0].textContent,
-                            garcom: colunas[1].textContent,
-                            data: colunas[2].textContent,
-                            total: colunas[3].textContent.replace('R$', '').trim(),
-                            itens: JSON.parse(colunas[4].textContent)
-                        };
-                    
-                        const printResponse = await fetch('http://localhost:3000/imprimir', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(comanda)
-                        });
-                    
-                        if (!printResponse.ok) {
-                            throw new Error('Falha na impressão');
-                        }
-                        
-                        window.location.reload();
-                        //alert('Comanda impressa com sucesso!');
-                    } catch (error) {
-                        console.error('Erro:', error);
-                        //alert('Usando impressão alternativa: ' + error.message);
-                        imprimir(); // Fallback para impressão pelo navegador
-                    }
-                }
+                //            // Aguarda 3 segundos para o servidor iniciar
+                //            await new Promise(resolve => setTimeout(resolve, 3000));
+                //        }
+                //    
+                //        // Continua com a impressão normal
+                //        const colunas = linhaSelecionada.querySelectorAll("td");
+                //        const comanda = {
+                //            mesa: linhaSelecionada.getAttribute('data-id'),
+                //            cliente: colunas[0].textContent,
+                //            garcom: colunas[1].textContent,
+                //            data: colunas[2].textContent,
+                //            total: colunas[3].textContent.replace('R$', '').trim(),
+                //            itens: JSON.parse(colunas[4].textContent)
+                //        };
+                //    
+                //        const printResponse = await fetch('http://localhost:3000/imprimir', {
+                //            method: 'POST',
+                //            headers: { 'Content-Type': 'application/json' },
+                //            body: JSON.stringify(comanda)
+                //        });
+                //    
+                //        if (!printResponse.ok) {
+                //            throw new Error('Falha na impressão');
+                //        }
+                //        
+                //        window.location.reload();
+                //        //alert('Comanda impressa com sucesso!');
+                //    } catch (error) {
+                //        console.error('Erro:', error);
+                //        //alert('Usando impressão alternativa: ' + error.message);
+                //        imprimir(); // Fallback para impressão pelo navegador
+                //    }
+                //}
             </script>
         <?php
             // start-print-server.php
-            $output = shell_exec('node C:/wamp64/www/CardapioClick/servidor-impressao.js > print-server.log 2>&1 &');
+            //$output = shell_exec('node C:/wamp64/www/CardapioClick/servidor-impressao.js > print-server.log 2>&1 &');
             //header('Content-Type: application/json');
             //echo json_encode(['success' => true]);
         ?>
@@ -963,53 +964,75 @@
                     </script>
                 </div>
 
-                <!-- CARD GRÁFICO DE FORMAS DE PAGAMENTO -->
-                <div class="Card" id="container" style="width: 400px; height: auto; border-radius: 10px;">
-                    <?php
-                        $sql_BI_Fp = "SELECT SUM(ven_Valor) AS Faturamento, ven_Formapag 
-                                      FROM vendas 
-                                      ". $condicao1 ." 
-                                      GROUP BY ven_Formapag";
-                        $result_BI_Fp = $conn->query($sql_BI_Fp);
+<!-- CARD GRÁFICO DE FORMAS DE PAGAMENTO -->
+<div class="Card" id="container" style="width: 400px; height: auto; border-radius: 10px;">
+    <?php
+        $sql_BI_Fp = "SELECT ven_Formapag 
+                      FROM vendas 
+                      ". $condicao1 ." 
+                      WHERE ven_Formapag IS NOT NULL AND ven_Formapag <> ''";
+        $result_BI_Fp = $conn->query($sql_BI_Fp);
 
-                        // Array para armazenar os dados de formas de pagamento
-                        $formasPagamento = [];
-                        while ($row = mysqli_fetch_assoc($result_BI_Fp)) {
-                            $forma = $row['ven_Formapag'] ? htmlspecialchars($row['ven_Formapag']) : 'Não Informado';
-                            $faturamento = floatval($row['Faturamento']);
-                            $formasPagamento[] = [$forma, $faturamento];
-                        }
-                        // Se não houver dados, definir um array padrão para evitar erros no gráfico
-                        if (empty($formasPagamento)) {
-                            $formasPagamento = [
-                                ['Cartão de Débito', 0],
-                                ['Cartão de Crédito', 0],
-                                ['Pix', 0],
-                                ['Dinheiro', 0]
-                            ];
-                        }
-                    ?>
-                    
+        // Array para armazenar os dados de formas de pagamento
+        $formasPagamento = [
+            'Dinheiro' => 0,
+            'Cartão de Crédito' => 0,
+            'Cartão de Débito' => 0,
+            'PIX' => 0,
+            'Não Informado' => 0
+        ];
 
-                    <script>
-                        var cores = ["#FF6384", "#3D52BB", "#FFCE56", "#34A853","#F16838"]; // rosa, azul, amarelo, verde
-                        anychart.onDocumentReady(function () {
-                            // Cria uma instância de um gráfico de pizza
-                            var chart = anychart.pie();
-                            // Define os dados dinamicamente a partir do PHP
-                            chart.data(<?php echo json_encode($formasPagamento); ?>);
-                            chart.palette(cores); // <--- Adiciona esta linha
-                            // Define o título do gráfico
-                            chart.title("Formas de Pagamento");
-                            // Define o container do gráfico
-                            chart.container("container");
-                            const container = document.getElementById("container");
-                            container.style.borderRadius = '5px';
-                            // Inicia a exibição do gráfico
-                            chart.draw();
-                        });
-                    </script>
-                </div>
+        while ($row = mysqli_fetch_assoc($result_BI_Fp)) {
+            $jsonPagamentos = json_decode($row['ven_Formapag'], true);
+
+            if (is_array($jsonPagamentos)) {
+                foreach ($jsonPagamentos as $pag) {
+                    $forma = $pag['forma'] ?? 'Não Informado';
+                    $valor = floatval($pag['valor'] ?? 0);
+                    if (!isset($formasPagamento[$forma])) {
+                        $formasPagamento[$forma] = 0;
+                    }
+                    $formasPagamento[$forma] += $valor;
+                }
+            } else {
+                // Caso ven_Formapag não seja JSON, mantemos como "Não Informado"
+                $formasPagamento['Não Informado'] += 0;
+            }
+        }
+
+        // Converte para formato que o AnyChart entende [[forma, valor], ...]
+        $dadosChart = [];
+        foreach ($formasPagamento as $forma => $valor) {
+            $dadosChart[] = [$forma, $valor];
+        }
+
+        // Garante que sempre tenha dados
+        if (empty($dadosChart)) {
+            $dadosChart = [
+                ['Cartão de Débito', 0],
+                ['Cartão de Crédito', 0],
+                ['Pix', 0],
+                ['Dinheiro', 0]
+            ];
+        }
+    ?>
+
+    <script>
+        var cores = ["#FF6384", "#3D52BB", "#FFCE56", "#34A853", "#F16838"]; // rosa, azul, amarelo, verde
+        anychart.onDocumentReady(function () {
+            var chart = anychart.pie();
+            chart.data(<?php echo json_encode($dadosChart); ?>);
+            chart.palette(cores);
+            chart.title("Formas de Pagamento");
+            chart.container("container");
+            const container = document.getElementById("container");
+            container.style.borderRadius = '5px';
+            chart.draw();
+        });
+    </script>
+</div>
+
+            </div>
 
                 <script type="text/javascript">
                     function limpar() {
@@ -1020,8 +1043,9 @@
                 </script>
 
 
-                <!--------------------------------------------- ANÁLISE MAIS GRANULADA (PRODUTOS) ---------------------------------------------------->
-                
+        <!--------------------------------------------- ANÁLISE MAIS GRANULADA (PRODUTOS) ---------------------------------------------------->
+        <div style=" margin: 0 auto; width: 100%; background: rgba(0, 0, 0, 0.4); border-radius: 0 0 15px 15px; display: flex;
+                flex-direction: row; flex-wrap: wrap; justify-content: space-around; padding: 10px;">
                 <!-- CARTÕES E GRÁFICO DE COLUNAS -->
                 <div class="filtros">
                     <form action="" method="POST" id="formProd" style="display: flex; flex-direction: row; justify-content: space-between; flex-wrap: wrap;">
@@ -1041,224 +1065,226 @@
                         ?>
                     </form>
                 </div>
+                   
 
-        <?php
-                // ✅ Função para obter componentes de produtos compostos
-                function obterComponentesProduto($nomeProduto) {
-                    $produtosCompostos = [
-                        'Filé trinchado' => [
-                            ['nome' => 'Batata', 'quantidade' => 250],
-                            ['nome' => 'Gado', 'quantidade' => 250]
-                        ]
-                        // Adicione outros produtos compostos aqui
-                    ];
-                    
-                    return $produtosCompostos[trim($nomeProduto)] ?? null;
-                }
 
-                // ✅ Função para calcular custo por grama/unidade
-                function calcularCustoPorUnidade($conn, $nomeProduto, $dataIni, $dataFim) {
-                    // Buscar ID do produto
-                    $sql_id = "SELECT etq_Id, etq_Categoria FROM estoque WHERE etq_Nome = ?";
-                    $stmt = $conn->prepare($sql_id);
-                    $stmt->bind_param("s", $nomeProduto);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $produto = $result->fetch_assoc();
-                    $stmt->close();
-                    
-                    if (!$produto) {
-                        return 0;
-                    }
-                    
-                    $idProduto = $produto['etq_Id'];
-                    $categoria = $produto['etq_Categoria'];
-                    
-                    // Calcular custo médio ponderado do produto no período
-                    $whereData = "";
-                    $params = [$idProduto];
-                    $types = "i";
-                    
-                    if (!empty($dataIni) && !empty($dataFim)) {
-                        $whereData = "AND rom_Dataentrada BETWEEN ? AND ?";
-                        $params[] = $dataIni;
-                        $params[] = $dataFim;
-                        $types .= "ss";
-                    }
-                    
-                    $sql_custo = "
-                        SELECT 
-                            SUM(rom_Quantidade * rom_precounitario) / SUM(rom_Quantidade) AS custo_medio_por_unidade,
-                            SUM(rom_Quantidade) AS quantidade_total_comprada
-                        FROM romaneio 
-                        WHERE rom_Idproduto = ? $whereData
-                        AND rom_Quantidade > 0
-                    ";
-                    
-                    $stmt = $conn->prepare($sql_custo);
-                    $stmt->bind_param($types, ...$params);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
-                    $custo_data = $result->fetch_assoc();
-                    $stmt->close();
-                    
-                    $custoMedioPorUnidade = $custo_data['custo_medio_por_unidade'] ?? 0;
-                    
-                    // Para produtos vendidos por gramas (carnes, batata, etc.)
-                    if (strtolower($categoria) === 'carnes' || 
-                        in_array(strtolower($nomeProduto), ['batata', 'macaxeira'])) {
-                        // Converter custo por kg para custo por grama
-                        return $custoMedioPorUnidade / 1000; // custo por grama
-                    }
-                    
-                    return $custoMedioPorUnidade; // custo por unidade
-                }
-
-                // ✅ Função para calcular custo total de produto composto
-                function calcularCustoComposto($conn, $nomeProduto, $quantidadeVendida, $dataIni, $dataFim) {
-                    $componentes = obterComponentesProduto($nomeProduto);
-                    
-                    if (!$componentes) {
-                        return 0; // Não é produto composto
-                    }
-                    
-                    $custoTotal = 0;
-                    
-                    foreach ($componentes as $componente) {
-                        $nomeComponente = $componente['nome'];
-                        $quantidadePorPorcao = $componente['quantidade']; // em gramas
-                        
-                        $custoPorGrama = calcularCustoPorUnidade($conn, $nomeComponente, $dataIni, $dataFim);
-                        $custoComponente = $custoPorGrama * $quantidadePorPorcao * $quantidadeVendida;
-                        
-                        $custoTotal += $custoComponente;
-                    }
-                    
-                    return $custoTotal;
-                }
-
-                // ✅ Preparar variáveis
-                $produtoNome = mysqli_real_escape_string($conn, $_POST['produtoNome'] ?? '');
-
-                // Condições para as consultas
-                $condicoes = ["v.ven_Finalizada = 'S'"]; // Apenas vendas finalizadas
-                if (!empty($consulDataini) && !empty($consulDatafim)) {
-                    $condicoes[] = "v.ven_Data BETWEEN '$consulDataini' AND '$consulDatafim'";
-                }
-                $where = "WHERE " . implode(" AND ", $condicoes);
-
-                if (!empty($produtoNome)) {
-                    // ✅ Consulta principal para obter dados do produto
-                    $sql_principal = "
-                        SELECT 
-                            SUM(item.quantidade) AS quantidade_total_vendida,
-                            SUM(item.subtotal) AS faturamento_total,
-                            COUNT(DISTINCT v.ven_Mesa) AS total_mesas,
-                            COUNT(DISTINCT v.ven_Seq) AS total_vendas
-                        FROM vendas v
-                        JOIN JSON_TABLE(
-                            v.ven_Itens,
-                            '$[*]' COLUMNS (
-                                nome VARCHAR(255) PATH '$.nome',
-                                quantidade DECIMAL(10,2) PATH '$.quantidade',
-                                subtotal DECIMAL(10,2) PATH '$.subtotal'
-                            )
-                        ) AS item ON 1=1
-                        $where
-                        AND item.nome = '$produtoNome'
-                    ";
-                    
-                    $result_principal = $conn->query($sql_principal);
-                    $dados_produto = mysqli_fetch_object($result_principal);
-                    
-                    // Valores padrão
-                    $quantidadeVendida = $dados_produto->quantidade_total_vendida ?? 0;
-                    $faturamentoTotal = $dados_produto->faturamento_total ?? 0;
-                    $totalMesas = $dados_produto->total_mesas ?? 0;
-                    $totalVendas = $dados_produto->total_vendas ?? 0;
-                    
-                    // ✅ Calcular custo baseado na quantidade vendida
-                    $custoTotal = 0;
-                    
-                    if ($quantidadeVendida > 0) {
-                        // Verificar se é produto composto
-                        $componentes = obterComponentesProduto($produtoNome);
-                        
-                        if ($componentes) {
-                            // Produto composto
-                            $custoTotal = calcularCustoComposto($conn, $produtoNome, $quantidadeVendida, $consulDataini, $consulDatafim);
-                        } else {
-                            // Produto simples
-                            $custoPorUnidade = calcularCustoPorUnidade($conn, $produtoNome, $consulDataini, $consulDatafim);
+                <?php
+                        // ✅ Função para obter componentes de produtos compostos
+                        function obterComponentesProduto($nomeProduto) {
+                            $produtosCompostos = [
+                                'Filé trinchado' => [
+                                    ['nome' => 'Batata', 'quantidade' => 250],
+                                    ['nome' => 'Gado', 'quantidade' => 250]
+                                ]
+                                // Adicione outros produtos compostos aqui
+                            ];
                             
-                            // Buscar categoria para determinar se é vendido por gramas
-                            $sql_categoria = "SELECT etq_Categoria FROM estoque WHERE etq_Nome = '$produtoNome'";
-                            $result_cat = $conn->query($sql_categoria);
-                            $categoria_data = mysqli_fetch_object($result_cat);
-                            $categoria = $categoria_data->etq_Categoria ?? '';
-                            
-                            if (strtolower($categoria) === 'carnes' || 
-                                in_array(strtolower($produtoNome), ['batata', 'macaxeira'])) {
-                                // Produto vendido por gramas - cada unidade vendida = 250g
-                                $custoTotal = $custoPorUnidade * ($quantidadeVendida * 250);
-                            } else {
-                                // Produto vendido por unidades
-                                $custoTotal = $custoPorUnidade * $quantidadeVendida;
-                            }
+                            return $produtosCompostos[trim($nomeProduto)] ?? null;
                         }
-                    }
-                    
-                    // ✅ Calcular métricas
-                    $ticketMedio = ($totalMesas > 0) ? ($faturamentoTotal / $totalMesas) : 0;
-                    $lucroTotal = $faturamentoTotal - $custoTotal;
-                    $margemLucro = ($faturamentoTotal > 0) ? (($lucroTotal / $faturamentoTotal) * 100) : 0;
-                }
-        ?>
 
+                        // ✅ Função para calcular custo por grama/unidade
+                        function calcularCustoPorUnidade($conn, $nomeProduto, $dataIni, $dataFim) {
+                            // Buscar ID do produto
+                            $sql_id = "SELECT etq_Id, etq_Categoria FROM estoque WHERE etq_Nome = ?";
+                            $stmt = $conn->prepare($sql_id);
+                            $stmt->bind_param("s", $nomeProduto);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $produto = $result->fetch_assoc();
+                            $stmt->close();
+                            
+                            if (!$produto) {
+                                return 0;
+                            }
+                            
+                            $idProduto = $produto['etq_Id'];
+                            $categoria = $produto['etq_Categoria'];
+                            
+                            // Calcular custo médio ponderado do produto no período
+                            $whereData = "";
+                            $params = [$idProduto];
+                            $types = "i";
+                            
+                            if (!empty($dataIni) && !empty($dataFim)) {
+                                $whereData = "AND rom_Dataentrada BETWEEN ? AND ?";
+                                $params[] = $dataIni;
+                                $params[] = $dataFim;
+                                $types .= "ss";
+                            }
+                            
+                            $sql_custo = "
+                                SELECT 
+                                    SUM(rom_Quantidade * rom_precounitario) / SUM(rom_Quantidade) AS custo_medio_por_unidade,
+                                    SUM(rom_Quantidade) AS quantidade_total_comprada
+                                FROM romaneio 
+                                WHERE rom_Idproduto = ? $whereData
+                                AND rom_Quantidade > 0
+                            ";
+                            
+                            $stmt = $conn->prepare($sql_custo);
+                            $stmt->bind_param($types, ...$params);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
+                            $custo_data = $result->fetch_assoc();
+                            $stmt->close();
+                            
+                            $custoMedioPorUnidade = $custo_data['custo_medio_por_unidade'] ?? 0;
+                            
+                            // Para produtos vendidos por gramas (carnes, batata, etc.)
+                            if (strtolower($categoria) === 'carnes' || 
+                                in_array(strtolower($nomeProduto), ['batata', 'macaxeira'])) {
+                                // Converter custo por kg para custo por grama
+                                return $custoMedioPorUnidade / 1000; // custo por grama
+                            }
+                            
+                            return $custoMedioPorUnidade; // custo por unidade
+                        }
 
-        <!--CARD FATURAMENTO TOTAL -->
-        <div class="Card">
-            <h3>💰 Faturamento Bruto</h3>
-            <p class="valor-principal">R$ <?php echo number_format($faturamentoTotal ?? 0, 2, ',', '.'); ?></p>
-            <small>Quantidade vendida: <?php echo number_format($quantidadeVendida ?? 0, 0, ',', '.'); ?> unidades</small>
-        </div>
+                        // ✅ Função para calcular custo total de produto composto
+                        function calcularCustoComposto($conn, $nomeProduto, $quantidadeVendida, $dataIni, $dataFim) {
+                            $componentes = obterComponentesProduto($nomeProduto);
+                            
+                            if (!$componentes) {
+                                return 0; // Não é produto composto
+                            }
+                            
+                            $custoTotal = 0;
+                            
+                            foreach ($componentes as $componente) {
+                                $nomeComponente = $componente['nome'];
+                                $quantidadePorPorcao = $componente['quantidade']; // em gramas
+                                
+                                $custoPorGrama = calcularCustoPorUnidade($conn, $nomeComponente, $dataIni, $dataFim);
+                                $custoComponente = $custoPorGrama * $quantidadePorPorcao * $quantidadeVendida;
+                                
+                                $custoTotal += $custoComponente;
+                            }
+                            
+                            return $custoTotal;
+                        }
 
-        <!--CARD TICKET MÉDIO -->
-        <div class="Card">
-            <h3>🎯 Ticket Médio</h3>
-            <p class="valor-principal">R$ <?php echo number_format($ticketMedio ?? 0, 2, ',', '.'); ?></p>
-            <small>Baseado em <?php echo $totalMesas ?? 0; ?> mesas</small>
-        </div>
+                        // ✅ Preparar variáveis
+                        $produtoNome = mysqli_real_escape_string($conn, $_POST['produtoNome'] ?? '');
 
-        <!--CARD CUSTOS -->
-        <div class="Card" style="width: 280px;">
-            <h3>📊 Custo Total</h3>
-            <p class="valor-principal">R$ <?php echo number_format($custoTotal ?? 0, 2, ',', '.'); ?></p>
-            <small>
-                <?php 
-                if (!empty($produtoNome) && $quantidadeVendida > 0) {
-                    $custoPorUnidade = $custoTotal / $quantidadeVendida;
-                    echo "Custo por unidade: R$ " . number_format($custoPorUnidade, 2, ',', '.');
-                }
+                        // Condições para as consultas
+                        $condicoes = ["v.ven_Finalizada = 'S'"]; // Apenas vendas finalizadas
+                        if (!empty($consulDataini) && !empty($consulDatafim)) {
+                            $condicoes[] = "v.ven_Data BETWEEN '$consulDataini' AND '$consulDatafim'";
+                        }
+                        $where = "WHERE " . implode(" AND ", $condicoes);
+
+                        if (!empty($produtoNome)) {
+                            // ✅ Consulta principal para obter dados do produto
+                            $sql_principal = "
+                                SELECT 
+                                    SUM(item.quantidade) AS quantidade_total_vendida,
+                                    SUM(item.subtotal) AS faturamento_total,
+                                    COUNT(DISTINCT v.ven_Mesa) AS total_mesas,
+                                    COUNT(DISTINCT v.ven_Seq) AS total_vendas
+                                FROM vendas v
+                                JOIN JSON_TABLE(
+                                    v.ven_Itens,
+                                    '$[*]' COLUMNS (
+                                        nome VARCHAR(255) PATH '$.nome',
+                                        quantidade DECIMAL(10,2) PATH '$.quantidade',
+                                        subtotal DECIMAL(10,2) PATH '$.subtotal'
+                                    )
+                                ) AS item ON 1=1
+                                $where
+                                AND item.nome = '$produtoNome'
+                            ";
+                            
+                            $result_principal = $conn->query($sql_principal);
+                            $dados_produto = mysqli_fetch_object($result_principal);
+                            
+                            // Valores padrão
+                            $quantidadeVendida = $dados_produto->quantidade_total_vendida ?? 0;
+                            $faturamentoTotal = $dados_produto->faturamento_total ?? 0;
+                            $totalMesas = $dados_produto->total_mesas ?? 0;
+                            $totalVendas = $dados_produto->total_vendas ?? 0;
+                            
+                            // ✅ Calcular custo baseado na quantidade vendida
+                            $custoTotal = 0;
+                            
+                            if ($quantidadeVendida > 0) {
+                                // Verificar se é produto composto
+                                $componentes = obterComponentesProduto($produtoNome);
+                                
+                                if ($componentes) {
+                                    // Produto composto
+                                    $custoTotal = calcularCustoComposto($conn, $produtoNome, $quantidadeVendida, $consulDataini, $consulDatafim);
+                                } else {
+                                    // Produto simples
+                                    $custoPorUnidade = calcularCustoPorUnidade($conn, $produtoNome, $consulDataini, $consulDatafim);
+                                    
+                                    // Buscar categoria para determinar se é vendido por gramas
+                                    $sql_categoria = "SELECT etq_Categoria FROM estoque WHERE etq_Nome = '$produtoNome'";
+                                    $result_cat = $conn->query($sql_categoria);
+                                    $categoria_data = mysqli_fetch_object($result_cat);
+                                    $categoria = $categoria_data->etq_Categoria ?? '';
+                                    
+                                    if (strtolower($categoria) === 'carnes' || 
+                                        in_array(strtolower($produtoNome), ['batata', 'macaxeira'])) {
+                                        // Produto vendido por gramas - cada unidade vendida = 250g
+                                        $custoTotal = $custoPorUnidade * ($quantidadeVendida * 250);
+                                    } else {
+                                        // Produto vendido por unidades
+                                        $custoTotal = $custoPorUnidade * $quantidadeVendida;
+                                    }
+                                }
+                            }
+                            
+                            // ✅ Calcular métricas
+                            $ticketMedio = ($totalMesas > 0) ? ($faturamentoTotal / $totalMesas) : 0;
+                            $lucroTotal = $faturamentoTotal - $custoTotal;
+                            $margemLucro = ($faturamentoTotal > 0) ? (($lucroTotal / $faturamentoTotal) * 100) : 0;
+                        }
                 ?>
-            </small>
-        </div>
 
-        <!--CARD LUCRO -->
-        <div class="Card" style="width: 280px;">
-            <h3>💎 Lucro Líquido</h3>
-            <p class="valor-principal <?php echo ($lucroTotal >= 0) ? 'positivo' : 'negativo'; ?>">
-                R$ <?php echo number_format($lucroTotal ?? 0, 2, ',', '.'); ?>
-            </p>
-            <small>
-                Margem: <?php echo number_format($margemLucro ?? 0, 1, ',', '.'); ?>%
-                <br>
-                <span style="font-size: 11px;">
-                    <?php echo number_format($faturamentoTotal ?? 0, 2, ',', '.'); ?> - 
-                    <?php echo number_format($custoTotal ?? 0, 2, ',', '.'); ?>
-                </span>
-            </small>
-        </div>
+
+                <!--CARD FATURAMENTO TOTAL -->
+                <div class="Card">
+                    <h3>💰 Faturamento Bruto</h3>
+                    <p class="valor-principal">R$ <?php echo number_format($faturamentoTotal ?? 0, 2, ',', '.'); ?></p>
+                    <small>Quantidade vendida: <?php echo number_format($quantidadeVendida ?? 0, 0, ',', '.'); ?> unidades</small>
+                </div>
+
+                <!--CARD TICKET MÉDIO -->
+                <div class="Card">
+                    <h3>🎯 Ticket Médio</h3>
+                    <p class="valor-principal">R$ <?php echo number_format($ticketMedio ?? 0, 2, ',', '.'); ?></p>
+                    <small>Baseado em <?php echo $totalMesas ?? 0; ?> mesas</small>
+                </div>
+
+                <!--CARD CUSTOS -->
+                <div class="Card" style="width: 300px;">
+                    <h3>📊 Custo Total</h3>
+                    <p class="valor-principal">R$ <?php echo number_format($custoTotal ?? 0, 2, ',', '.'); ?></p>
+                    <small>
+                        <?php 
+                        if (!empty($produtoNome) && $quantidadeVendida > 0) {
+                            $custoPorUnidade = $custoTotal / $quantidadeVendida;
+                            echo "Custo por unidade: R$ " . number_format($custoPorUnidade, 2, ',', '.');
+                        }
+                        ?>
+                    </small>
+                </div>
+
+                <!--CARD LUCRO -->
+                <div class="Card" style="width: 300px;">
+                    <h3>💎 Lucro Líquido</h3>
+                    <p class="valor-principal <?php echo ($lucroTotal >= 0) ? 'positivo' : 'negativo'; ?>">
+                        R$ <?php echo number_format($lucroTotal ?? 0, 2, ',', '.'); ?>
+                    </p>
+                    <small>
+                        Margem: <?php echo number_format($margemLucro ?? 0, 1, ',', '.'); ?>%
+                        <br>
+                        <span style="font-size: 11px;">
+                            <?php echo number_format($faturamentoTotal ?? 0, 2, ',', '.'); ?> - 
+                            <?php echo number_format($custoTotal ?? 0, 2, ',', '.'); ?>
+                        </span>
+                    </small>
+                </div>
 
                 <style>
                         .Card {
@@ -1373,11 +1399,12 @@
                         }
                 </script>
 
+        </div>
     </section>
     
 
     <!--------------------------------------------------- LOCAL DO GRÁFICO DE ATUALIDADES DA EMPRESA ------------------------------------------------------------>
-<!--    
+<!--
     <section>
         <h1 class="title">Gestão de equipe</h1>
 
@@ -1406,9 +1433,8 @@
         <div id="container" style="width:100%; height:600px;"></div>  
         
         Área do gráfico 
-                    -->
-        <?php
-/*
+-->      
+        <?php /*
             $labels = [];
             $dados = [];
 
@@ -1468,7 +1494,7 @@
 
                 $conn->close();
             }
-*/
+            */
             ?>
 
             <!-- AnyChart 3D -->
@@ -1513,8 +1539,8 @@
                         });
                     }
                 </script>
+-->
             <?php // endif; ?>
     </section>
--->
 </body>
 </html>

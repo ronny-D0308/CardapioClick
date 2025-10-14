@@ -12,5 +12,7 @@
 
     date_default_timezone_set('America/Sao_Paulo');
 
+    $endereco = "https://cardapioclick.byethost14.com/";
+
 
 ?>

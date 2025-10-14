@@ -208,39 +208,40 @@ $usuario = $_SESSION['usuario'];
             </thead>
             <tbody align="center">
                 <?php while($linhas = mysqli_fetch_object($query_geral)) {
-                
+
                     $cat = strtolower($linhas->etq_Categoria);
-                
-                    // Ajustar quantidade para carnes (de gramas para Kg)
-                    if ($cat == "carnes") {
+
+                    // Ajustar quantidade para carnes e porções (de gramas para Kg)
+                    if ($cat == "carnes" || $cat == "porcoes") {
                         $Qtd = number_format($linhas->total_quantidade / 1000, 2, ',', '.');
                     } else {
                         $Qtd = $linhas->total_quantidade;
                     }
-                
+
                     // Unidade conforme categoria
                     switch ($cat) {
                         case 'bebidas':
                         case 'bebida':
                             $Unid = "Unidades";
                             break;
-                        case 'Porcoes':
+                        case 'porcoes':
                             $Unid = "Pct";
                             break;
                         case 'carnes':
                             $Unid = "Kg";
                             break;
                         default:
-                            $Unid = ""; // pode ser "", ou use valor default do banco
+                            $Unid = "";
                             break;
                     }
-                
-                    echo "<tr data-id='" . $linhas->etq_Id . "'>";
+
+                    echo "<tr data-id='{$linhas->etq_Id}'>";
                     echo "<td>{$linhas->etq_Nome}</td>";
                     echo "<td>{$linhas->etq_Categoria}</td>";
                     echo "<td>{$Qtd} {$Unid}</td>";
-                }
-                ?>
+                    echo "</tr>";
+                } ?>
+
             </tbody>
         </table>
     </div>
