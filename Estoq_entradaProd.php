@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
     //$linha = mysqli_fetch_object($query_prod);
     //$QuantidadeBD = $linha->rom_Qtdunidade;
 
-    // INICIA AS VERIFICAÇÕES PARA INSERÇÃO DE VALORES NO ESTOQUE +  CALCULO DO PREÇO UNITÁRIO
+    // INICIA AS VERIFICAÇÕES PARA INSERÇÃO DE VALORES NO ESTOQUE + CALCULO DO PREÇO UNITÁRIO
     if ($categoria == "Carnes" || $categoria == "Porcoes" ) {
         $valor = $Preco;
         $quantidade = $quantidade * 1000;
@@ -42,6 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['IdProd'])) {
         $quantidade = $quantidade;
         $Preco_unit = $Preco / $quantidade;
     } 
+    else if ($categoria == "Destilados") {
+        $valor = $Preco;
+        $quantidade = $quantidade * 1000;
+        $Preco_unit = ($Preco / 1000) * 50;
+    }
     else {
         $valor = $Preco;
         $quantidade = $quantidade;

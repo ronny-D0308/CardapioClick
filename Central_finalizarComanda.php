@@ -76,7 +76,16 @@ while ($row = $result->fetch_assoc()) {
             if ($stmtRom->fetch()) {
                 $stmtRom->close();
 
-                $novaQtd = ($Categoria == "Carnes") ? $qtdAtual + 250 : $qtdAtual + 1;
+                if ($Categoria == "Carnes") {
+                    // carnes voltam em gramas
+                    $novaQtd = $qtdAtual + 250;
+                } elseif ($Categoria == "Destilados") {
+                    // destilados voltam em mililitros (padrão de 50ml, por exemplo)
+                    $novaQtd = $qtdAtual + 50;
+                } else {
+                    // demais itens voltam por unidade
+                    $novaQtd = $qtdAtual + 1;
+                }
 
                 $updateRom = $conn->prepare("UPDATE romaneio SET rom_Quantidade = ? WHERE rom_Id = ?");
                 $updateRom->bind_param("ii", $novaQtd, $romId);

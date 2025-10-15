@@ -21,9 +21,10 @@ document.addEventListener('DOMContentLoaded', function () {
           modalContent.innerHTML = '';
           let totalComanda = 0;
 
+          document.getElementById('venMesa').value = comandaId;
+
           if (data.temItens && data.itens.length > 0) {
             const primeiroItem = data.itens[0];
-            document.getElementById('venMesa').value = primeiroItem.ven_Mesa;
 
             let tabelaHTML = `
               <table style="width:100%; border-collapse: collapse; font-family: sans-serif;">

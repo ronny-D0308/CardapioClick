@@ -15,12 +15,22 @@ if (!$venMesa || empty($pagamentos)) {
     exit;
 }
 
-// Atualiza a venda como finalizada, armazenando os pagamentos em JSON
-$pagamentosJSON = json_encode($pagamentos, JSON_UNESCAPED_UNICODE);
+// Monta string legível para salvar no VARCHAR
+$pagamentosStr = [];
+foreach ($pagamentos as $p) {
+    $forma = ucfirst($p['forma']);
+    $valor = number_format((float)$p['valor'], 2, ',', '.');
+    $pagamentosStr[] = "{$forma}: ${valor}";
+}
+$pagamentosFinal = implode(' | ', $pagamentosStr);
 
-$sql_upd = "UPDATE vendas SET ven_Finalizada = 'S', ven_Formapag = ? WHERE ven_Mesa = ? AND ven_Finalizada <> 'S'";
+// Atualiza venda como finalizada
+$sql_upd = "UPDATE vendas 
+             SET ven_Finalizada = 'S', ven_Formapag = ? 
+             WHERE ven_Mesa = ? AND ven_Finalizada <> 'S'";
 $stmt_upd = $conn->prepare($sql_upd);
-$stmt_upd->bind_param("si", $pagamentosJSON, $venMesa);
+$stmt_upd->bind_param("si", $pagamentosFinal, $venMesa);
+
 
 if ($stmt_upd->execute()) {
     $response['sucesso'] = true;

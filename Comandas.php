@@ -908,42 +908,67 @@
       //menuModal.style.display = 'none'; // Fecha o modal de cardápio
     });
 
-closeComandaBtn.addEventListener('click', function () {
-    const venMesa = parseInt(document.getElementById('venMesa').value);
+    closeComandaBtn.addEventListener('click', function () {
+        const venMesa = parseInt(document.getElementById('venMesa').value);
 
-    if (confirm("Deseja realmente finalizar e imprimir esta comanda?")) {
+        if (confirm("Deseja realmente finalizar e imprimir esta comanda?")) {
 
-        // Overlay escuro
-        const overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
-        overlay.style.zIndex = '999';
-        document.body.appendChild(overlay);
+            // Overlay escuro
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+            overlay.style.zIndex = '999';
+            document.body.appendChild(overlay);
 
-        // Modal de pagamentos
-        const modal = document.createElement('div');
-        modal.style.position = 'fixed';
-        modal.style.top = '50%';
-        modal.style.left = '50%';
-        modal.style.transform = 'translate(-50%, -50%)';
-        modal.style.backgroundColor = 'white';
-        modal.style.padding = '20px';
-        modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-        modal.style.zIndex = '1000';
-        modal.style.display = 'flex';
-        modal.style.flexDirection = 'column';
-        modal.style.alignItems = 'center';
-        modal.style.width = '350px';
-        modal.style.borderRadius = '8px';
+            // Modal de pagamentos
+            const modal = document.createElement('div');
+            modal.style.position = 'fixed';
+            modal.style.top = '50%';
+            modal.style.left = '50%';
+            modal.style.transform = 'translate(-50%, -50%)';
+            modal.style.backgroundColor = 'white';
+            modal.style.padding = '20px';
+            modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
+            modal.style.zIndex = '1000';
+            modal.style.display = 'flex';
+            modal.style.flexDirection = 'column';
+            modal.style.alignItems = 'center';
+            modal.style.width = '350px';
+            modal.style.borderRadius = '8px';
 
-        modal.innerHTML = `
-            <h4 style='color:black;'>Forma(s) de Pagamento</h4>
-            <div id="pagamentos-container" style="width:100%; margin-bottom:10px;">
-                <div class="pagamento-item" style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            modal.innerHTML = `
+                <h4 style='color:black;'>Forma(s) de Pagamento</h4>
+                <div id="pagamentos-container" style="width:100%; margin-bottom:10px;">
+                    <div class="pagamento-item" style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <select class="forma-pagamento" style="flex:1; margin-right:5px;">
+                            <option value="">Selecione...</option>
+                            <option value="dinheiro">Dinheiro</option>
+                            <option value="credito">Cartão de Crédito</option>
+                            <option value="debito">Cartão de Débito</option>
+                            <option value="pix">PIX</option>
+                        </select>
+                        <input type="number" class="valor-pagamento" placeholder="Valor" style="flex:1;">
+                    </div>
+                </div>
+                <button id="add-payment-method" class="botoesformapag" style="margin-bottom:10px;">Adicionar método</button>
+                <button class='botoesformapag' id="confirmarPagamento">Confirmar</button>
+                <button class='botoesformapag' id="cancelarPagamento">Cancelar</button>
+            `;
+            document.body.appendChild(modal);
+
+            // Adicionar novo método de pagamento
+            document.getElementById('add-payment-method').addEventListener('click', () => {
+                const container = document.getElementById('pagamentos-container');
+                const div = document.createElement('div');
+                div.classList.add('pagamento-item');
+                div.style.display = 'flex';
+                div.style.justifyContent = 'space-between';
+                div.style.marginBottom = '5px';
+                div.innerHTML = `
                     <select class="forma-pagamento" style="flex:1; margin-right:5px;">
                         <option value="">Selecione...</option>
                         <option value="dinheiro">Dinheiro</option>
@@ -952,85 +977,60 @@ closeComandaBtn.addEventListener('click', function () {
                         <option value="pix">PIX</option>
                     </select>
                     <input type="number" class="valor-pagamento" placeholder="Valor" style="flex:1;">
-                </div>
-            </div>
-            <button id="add-payment-method" class="botoesformapag" style="margin-bottom:10px;">Adicionar método</button>
-            <button class='botoesformapag' id="confirmarPagamento">Confirmar</button>
-            <button class='botoesformapag' id="cancelarPagamento">Cancelar</button>
-        `;
-        document.body.appendChild(modal);
+                `;
+                container.appendChild(div);
+            });
 
-        // Adicionar novo método de pagamento
-        document.getElementById('add-payment-method').addEventListener('click', () => {
-            const container = document.getElementById('pagamentos-container');
-            const div = document.createElement('div');
-            div.classList.add('pagamento-item');
-            div.style.display = 'flex';
-            div.style.justifyContent = 'space-between';
-            div.style.marginBottom = '5px';
-            div.innerHTML = `
-                <select class="forma-pagamento" style="flex:1; margin-right:5px;">
-                    <option value="">Selecione...</option>
-                    <option value="dinheiro">Dinheiro</option>
-                    <option value="credito">Cartão de Crédito</option>
-                    <option value="debito">Cartão de Débito</option>
-                    <option value="pix">PIX</option>
-                </select>
-                <input type="number" class="valor-pagamento" placeholder="Valor" style="flex:1;">
-            `;
-            container.appendChild(div);
-        });
+            // Confirmar pagamento
+            document.getElementById('confirmarPagamento').addEventListener('click', () => {
+                const itens = itensDaComandaAtual.map(item => ({
+                    nome: item.nome,
+                    quantidade: item.quantidade
+                }));
 
-        // Confirmar pagamento
-        document.getElementById('confirmarPagamento').addEventListener('click', () => {
-            const itens = itensDaComandaAtual.map(item => ({
-                nome: item.nome,
-                quantidade: item.quantidade
-            }));
+                const pagamentos = [];
+                const selects = modal.querySelectorAll('.forma-pagamento');
+                const valores = modal.querySelectorAll('.valor-pagamento');
 
-            const pagamentos = [];
-            const selects = modal.querySelectorAll('.forma-pagamento');
-            const valores = modal.querySelectorAll('.valor-pagamento');
-
-            for (let i = 0; i < selects.length; i++) {
-                const forma = selects[i].value;
-                const valor = parseFloat(valores[i].value) || 0;
-                if (forma && valor > 0) {
-                    pagamentos.push({ forma, valor });
+                for (let i = 0; i < selects.length; i++) {
+                    const forma = selects[i].value;
+                    const valor = parseFloat(valores[i].value) || 0;
+                    if (forma && valor > 0) {
+                        pagamentos.push({ forma, valor });
+                    }
                 }
-            }
 
-            if (pagamentos.length === 0) {
-                alert("Informe pelo menos um método de pagamento válido.");
-                return;
-            }
-
-            // Envia dados para o PHP
-            fetch(`fechar_comanda.php?venMesa=${venMesa}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itens, pagamentos })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.sucesso) {
-                    document.body.removeChild(modal);
-                    document.body.removeChild(overlay);
-                    window.location.reload();
-                } else {
-                    alert('Erro ao fechar comanda: ' + data.erro);
+                if (pagamentos.length === 0) {
+                    alert("Informe pelo menos um método de pagamento válido.");
+                    return;
                 }
-            })
-            .catch(err => console.error(err));
-        });
 
-        // Cancelar
-        document.getElementById('cancelarPagamento').addEventListener('click', () => {
-            document.body.removeChild(modal);
-            document.body.removeChild(overlay);
-        });
-    }
-});
+                // Envia dados para o PHP
+                fetch(`fechar_comanda.php?venMesa=${venMesa}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ itens, pagamentos })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.sucesso) {
+                        document.body.removeChild(modal);
+                        document.body.removeChild(overlay);
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao fechar comanda: ' + data.erro);
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+
+            // Cancelar
+            document.getElementById('cancelarPagamento').addEventListener('click', () => {
+                document.body.removeChild(modal);
+                document.body.removeChild(overlay);
+            });
+        }
+    });
 
 
     // Selecionando os elementos

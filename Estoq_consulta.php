@@ -212,29 +212,34 @@ $usuario = $_SESSION['usuario'];
                     $cat = strtolower($linhas->etq_Categoria);
 
                     // Ajustar quantidade para carnes e porções (de gramas para Kg)
-                    if ($cat == "carnes" || $cat == "porcoes") {
+                    if ($cat == "carnes" || $cat == "porcoes" || $cat == "destilados") {
                         $Qtd = number_format($linhas->total_quantidade / 1000, 2, ',', '.');
                     } else {
                         $Qtd = $linhas->total_quantidade;
                     }
-
                     // Unidade conforme categoria
                     switch ($cat) {
                         case 'bebidas':
                         case 'bebida':
                             $Unid = "Unidades";
                             break;
+                    
                         case 'porcoes':
                             $Unid = "Pct";
                             break;
+                    
                         case 'carnes':
                             $Unid = "Kg";
                             break;
+                    
+                        case 'destilados':
+                            $Unid = "L";
+                            break; // ← Faltava este break!
+                    
                         default:
                             $Unid = "";
                             break;
                     }
-
                     echo "<tr data-id='{$linhas->etq_Id}'>";
                     echo "<td>{$linhas->etq_Nome}</td>";
                     echo "<td>{$linhas->etq_Categoria}</td>";

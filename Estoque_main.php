@@ -78,7 +78,7 @@ $query = mysqli_query($conn, $sql_del);
         }
         .card {
             width: 200px; 
-            height: 60px;
+            height: auto;
             background-color: rgba(0, 0, 0, 0.6);
             border-radius: 10px;
             color: white;

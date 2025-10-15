@@ -194,121 +194,121 @@
 
 </head>
 
-<script type="text/javascript">
-	
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.conteiner-produto').forEach(produto => {
-        const label = produto.querySelector('label') || produto.querySelector('h2'); // Inclui h2 para "Baião"
-        const input = produto.querySelector('input');
-        
-        if (!label || !input) return; // Pula se não encontrar elementos
-        
-        const nomeItem = label.textContent.trim();
-
-        // Envia o nome do item ao backend
-        fetch(`Bloqueia_item.php`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ item: nomeItem })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.bloquear === true) {
-                console.log(`Produto bloqueado: ${nomeItem}`);
-                
-                // ✅ Melhor visualização para produtos bloqueados
-                input.style.display = 'none';
-                
-                // ✅ Adicionar indicador visual
-                const indicador = document.createElement('div');
-                indicador.className = 'produto-indisponivel';
-                indicador.innerHTML = '❌ Indisponível';
-                indicador.style.cssText = `
-                    color: #ff6b6b;
-                    font-size: 14px;
-                    font-weight: bold;
-                    margin-top: 5px;
-                    text-align: center;
-                `;
-                
-                // Adicionar o indicador após o input
-                input.parentNode.appendChild(indicador);
-                
-                // ✅ Opcional: Escurecer o container do produto
-                produto.style.opacity = '0.5';
-                produto.style.filter = 'grayscale(100%)';
-            }
-            
-            // ✅ Log de informações adicionais se disponível
-            if (data.motivo) {
-                console.log(`Motivo do bloqueio para ${nomeItem}: ${data.motivo}`);
-            }
-        })
-        .catch(error => {
-            console.error(`Erro ao verificar disponibilidade de ${nomeItem}:`, error);
-            
-            // ✅ Em caso de erro, mostrar aviso discreto
-            const avisoErro = document.createElement('div');
-            avisoErro.innerHTML = '⚠️ Erro ao verificar';
-            avisoErro.style.cssText = `
-                color: #ffa500;
-                font-size: 12px;
-                margin-top: 3px;
-                text-align: center;
-            `;
-            input.parentNode.appendChild(avisoErro);
-        });
-    });
-});
-
-function adicionarManual() {
-    const item = document.querySelector('input[name="Man_item"]').value.trim();
-    const quant = document.querySelector('input[name="Man_qtd"]').value;
-	const preco = parseFloat(document.querySelector('input[name="Man_preco"]').value);
-    const comandaId = <?= $comandaId ?>; // Certifique-se que $comandaId está definido no PHP
-    const nomeCliente = document.querySelector('input[name="nome_cliente"]').value.trim(); // ✅ Novo
-
-
-    if (!item || preco <= 0) {
-        alert('Preencha corretamente o item e preço do item.');
-        return;
-    }
-
-    fetch('adicionar_manual.php', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: `Man_item=${encodeURIComponent(item)}&Man_qtd=${quant}&Man_preco=${preco}&comandaId=${comandaId}&nome_cliente=${encodeURIComponent(nomeCliente)}`
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.erro) {
-            alert('Erro: ' + data.mensagem);
-        } else {
-            // alert(data.mensagem);
-
-            // Atualizar lista de itens (opcional)
-            console.log('Itens da comanda:', data.itens);
-
-            // Atualizar total no front-end
-            atualizarTotal(data.total);
-
-            // Redirecionar se necessário
-            if (data.redirect) {
-                window.location.href = data.redirect;
-            }
-        }
-    })
-    .catch(err => alert('Erro ao adicionar item: ' + err));
-}
-
-</script>
+	<script type="text/javascript">
+		
+		document.addEventListener('DOMContentLoaded', function () {
+		    document.querySelectorAll('.conteiner-produto').forEach(produto => {
+		        const label = produto.querySelector('label') || produto.querySelector('h2'); // Inclui h2 para "Baião"
+		        const input = produto.querySelector('input');
+		        
+		        if (!label || !input) return; // Pula se não encontrar elementos
+		        
+		        const nomeItem = label.textContent.trim();
+		
+		        // Envia o nome do item ao backend
+		        fetch(`Bloqueia_item.php`, {
+		            method: 'POST',
+		            headers: {
+		                'Content-Type': 'application/json'
+		            },
+		            body: JSON.stringify({ item: nomeItem })
+		        })
+		        .then(response => {
+		            if (!response.ok) {
+		                throw new Error(`HTTP error! status: ${response.status}`);
+		            }
+		            return response.json();
+		        })
+		        .then(data => {
+		            if (data.bloquear === true) {
+		                console.log(`Produto bloqueado: ${nomeItem}`);
+		                
+		                // ✅ Melhor visualização para produtos bloqueados
+		                input.style.display = 'none';
+		                
+		                // ✅ Adicionar indicador visual
+		                const indicador = document.createElement('div');
+		                indicador.className = 'produto-indisponivel';
+		                indicador.innerHTML = '❌ Indisponível';
+		                indicador.style.cssText = `
+		                    color: #ff6b6b;
+		                    font-size: 14px;
+		                    font-weight: bold;
+		                    margin-top: 5px;
+		                    text-align: center;
+		                `;
+		                
+		                // Adicionar o indicador após o input
+		                input.parentNode.appendChild(indicador);
+		                
+		                // ✅ Opcional: Escurecer o container do produto
+		                produto.style.opacity = '0.5';
+		                produto.style.filter = 'grayscale(100%)';
+		            }
+		            
+		            // ✅ Log de informações adicionais se disponível
+		            if (data.motivo) {
+		                console.log(`Motivo do bloqueio para ${nomeItem}: ${data.motivo}`);
+		            }
+		        })
+		        .catch(error => {
+		            console.error(`Erro ao verificar disponibilidade de ${nomeItem}:`, error);
+		            
+		            // ✅ Em caso de erro, mostrar aviso discreto
+		            const avisoErro = document.createElement('div');
+		            avisoErro.innerHTML = '⚠️ Erro ao verificar';
+		            avisoErro.style.cssText = `
+		                color: #ffa500;
+		                font-size: 12px;
+		                margin-top: 3px;
+		                text-align: center;
+		            `;
+		            input.parentNode.appendChild(avisoErro);
+		        });
+		    });
+		});
+		
+		function adicionarManual() {
+		    const item = document.querySelector('input[name="Man_item"]').value.trim();
+		    const quant = document.querySelector('input[name="Man_qtd"]').value;
+			const preco = parseFloat(document.querySelector('input[name="Man_preco"]').value);
+		    const comandaId = <?= $comandaId ?>; // Certifique-se que $comandaId está definido no PHP
+		    const nomeCliente = document.querySelector('input[name="nome_cliente"]').value.trim(); // ✅ Novo
+		
+		
+		    if (!item || preco <= 0) {
+		        alert('Preencha corretamente o item e preço do item.');
+		        return;
+		    }
+		
+		    fetch('adicionar_manual.php', {
+		        method: 'POST',
+		        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+		        body: `Man_item=${encodeURIComponent(item)}&Man_qtd=${quant}&Man_preco=${preco}&comandaId=${comandaId}&nome_cliente=${encodeURIComponent(		nomeCliente)}`
+		    })
+		    .then(res => res.json())
+		    .then(data => {
+		        if (data.erro) {
+		            alert('Erro: ' + data.mensagem);
+		        } else {
+		            // alert(data.mensagem);
+		
+		            // Atualizar lista de itens (opcional)
+		            console.log('Itens da comanda:', data.itens);
+		
+		            // Atualizar total no front-end
+		            atualizarTotal(data.total);
+		
+		            // Redirecionar se necessário
+		            if (data.redirect) {
+		                window.location.href = data.redirect;
+		            }
+		        }
+		    })
+		    .catch(err => alert('Erro ao adicionar item: ' + err));
+		}
+			
+	</script>
 
 
 <body>
@@ -384,7 +384,6 @@ function adicionarManual() {
 				
 			<!--CAMPOS DAS BEBIDAS-->
                 <h1 class="itens">Bebidas:</h1>
-
                 <div class="conteiner_bebidas">
 					<div class="conteiner-produto">
 						<label class="nome">Coca-cola 1LT</label>
@@ -418,7 +417,7 @@ function adicionarManual() {
 					</div>
 					<div class="conteiner-produto">
 						<label class="nome"> Jarra suco </label>
-						<input name="B26" class="QUANT"  id="B6" type="number"  min="0" onblur="atualizarTotal()">
+						<input name="B26" class="QUANT"  id="B26" type="number"  min="0" onblur="atualizarTotal()">
 					</div>
 					<div class="conteiner-produto">
 						<label class="nome">Àgua com gás</label>
@@ -652,85 +651,70 @@ function adicionarManual() {
 				}
 			</script>
 			-->
+<script>
+const precos = {
+    E1: 20.00, E2: 40.00, E3: 60.00, E4: 80.00, E5: 100.00, E6: 6.00, E7: 8.00, E8: 15.00, E9: 17.00,
+    B1: 10.00, B2: 8.00, B3: 7.00, B4: 3.50, B5: 5.00, B6: 3.00, B7: 3.00, B8: 2.00, B9: 3.00,
+    B10: 17.00, B11: 13.00, B12: 10.00, B13: 10.00, B14: 9.50, B15: 10.00, B16: 10.00, B17: 8.00, B18: 10.00, 
+    B19: 9.00, B20: 12.00, B21: 5.00, B22: 10.00, B23: 5.00, B24: 13.00, B25: 13.00, B26: 10.00,
+    W1: 12.00, W2: 10.00, W3: 10.00, W4: 10.00, W5: 15.00, W6: 10.00, W7: 10.00, W8: 2.00, W9: 10.00, W10: 4.00,
+    C1:60.00, C2: 50.00, C3: 40.00, C4: 30.00,
+    A1:8.00, A2: 9.00,
+    P1: 15.00, P2: 15.00, P3: 30.00
+};
 
-	<script>
-		const precos = {
-			E1: 20.00, E2: 40.00, E3: 60.00, E4: 80.00, E5: 100.00, E6: 6.00, E7: 8.00, E8: 15.00, E9: 17.00,
+function atualizarHiddenTotal() {
+    let totalText = document.getElementById("total").textContent;
+    let totalValue = totalText.replace("Total: R$ ", "").trim();
+    totalValue = parseFloat(totalValue.replace(',', '.')) || 0;
+    document.getElementById("total_input").value = totalValue.toFixed(2);
+}
 
-			B1: 10.00, B2: 8.00, B3: 7.00, B4: 3.50, B5: 5.00, B6: 3.00, B7: 3.00, B8: 2.00, B9: 3.00,
-			B10: 17.00, B11: 13.00, B12: 10.00, B13: 10.00, B14: 9.50, B15: 10.00, B16: 10.00, B17: 8.00, B18: 10.00, 
-			B19: 9.00, B20: 12.00, B21: 5.00, B22: 10.00, B23: 5.00, B24: 13.00, B25: 13.00, B26: 10.00,
+// Atualiza o total visível na tela e no input hidden
+function atualizarTotal() {
+    let total = 0;
 
-			W1: 12.00, W2: 10.00, W3: 10.00, W4: 10.00, W5: 15.00, W6: 10.00, W7: 10.00, W8: 2.00, W9: 10.00, W10: 4.00,
+    document.querySelectorAll(".QUANT").forEach(input => {
+        const id = input.id;
+        const quantidade = parseFloat(input.value) || 0;
+        const preco = precos[id] || 0;
 
-			C1:60.00, C2: 50.00, C3: 40.00, C4: 30.00,
+        total += quantidade * preco; // soma simples, sem conversões
+    });
 
-			A1:8.00, A2: 9.00,
+    document.getElementById("total").textContent = `Total: R$ ${total.toFixed(2)}`;
+    document.getElementById("total_input").value = total.toFixed(2);
+}
 
-			P1: 15.00, P2: 15.00, P3: 30.00
-		};
+// Prepara os itens selecionados para envio ao backend
+function getItensSelecionados() {
+    const itensSelecionados = [];
 
+    document.querySelectorAll('.conteiner-produto').forEach(produto => {
+        const input = produto.querySelector('input');
+        const label = produto.querySelector('label') || produto.querySelector('h2');
 
-		function atualizarTotal() {
-		    let total = 0;
-		
-		    document.querySelectorAll(".QUANT").forEach(input => {
-		        let id = input.id;
-		        let quantidade = parseFloat(input.value) || 0;
-		        let preco = precos[id] || 0;
-			
-		        // ✅ Se for carne (C1, C2, C3, C4), o valor digitado é em gramas
-		        if (id.startsWith("C")) {
-		            quantidade = quantidade / 1000; // converte gramas para kg
-		        }
-			
-		        total += quantidade * preco;
-		    });
-		
-		    document.getElementById("total").textContent = `Total: R$ ${total.toFixed(2)}`;
-		}
+        if (input && label) {
+            const quantidade = parseFloat(input.value) || 0;
 
+            if (quantidade > 0) {
+                const id = input.id;
+                const preco_unitario = precos[id] || 0;
 
-		function atualizarHiddenTotal() {
-			let totalText = document.getElementById("total").innerText;
-			let totalValue = totalText.replace("Total: R$ ", "").trim();
-			totalValue = parseFloat(totalValue.replace(',', '.')) || 0;
-			document.getElementById("total_input").value = totalValue.toFixed(2);
-		}
+                itensSelecionados.push({
+                    nome: label.textContent.trim(),
+                    quantidade: quantidade,         // envia exatamente o que o usuário digitou
+                    preco_unitario: preco_unitario,
+                    subtotal: quantidade * preco_unitario
+                });
+            }
+        }
+    });
 
-		// FUNÇÃO JAVASCRIPT QUE CARREGA OS ITENS E SEUS VALORES 
-		function getItensSelecionados() {
-		    const itensSelecionados = [];
-		
-		    document.querySelectorAll('.conteiner-produto').forEach(produto => {
-		        const input = produto.querySelector('input');
-		        const label = produto.querySelector('label') || produto.querySelector('h2');
-			
-		        if (input && label) {
-		            let quantidade = parseFloat(input.value);
-		            if (quantidade > 0) {
-		                const id = input.id;
-		                const preco_unitario = precos[id] || 0;
-					
-		                // ✅ Converte gramas em kg para carnes
-		                let quantidade_convertida = id.startsWith("C") ? quantidade / 1000 : quantidade;
-		                const subtotal = quantidade_convertida * preco_unitario;
-					
-		                itensSelecionados.push({
-		                    nome: label.textContent.trim(),
-		                    quantidade: quantidade_convertida,
-		                    preco_unitario: preco_unitario,
-		                    subtotal: subtotal
-		                });
-		            }
-		        }
-		    });
-		
-		    document.getElementById("itens_selecionados_input").value = JSON.stringify(itensSelecionados);
-		}
+    document.getElementById("itens_selecionados_input").value = JSON.stringify(itensSelecionados);
+}
+</script>
 
-
-	</script>
 			
 
 </body>

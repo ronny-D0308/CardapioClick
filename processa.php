@@ -162,17 +162,33 @@ function processarBaixaComposta($conn, $nomeProduto, $quantidade, $garcon, &$men
 
 // ✅ Função para calcular baixa de estoque
 function calcularBaixaEstoque($categoria, $nomeProduto, $quantidade) {
-    $produtosEspeciais = ['carnes'];
+    $categoria = strtolower(trim($categoria));
+    $nomeProduto = strtolower(trim($nomeProduto));
+
+    // Categorias ou nomes com baixa por grama
     $produtosPorGrama = ['batata', 'macaxeira'];
-    
-    // Verifica se é produto vendido por gramas
-    if (in_array(strtolower($categoria), $produtosEspeciais) || 
-        in_array(strtolower($nomeProduto), $produtosPorGrama)) {
-        return $quantidade * 250; // 250g por porção
+    $categoriasPorGrama = ['carnes'];
+
+    // Categoria de destilados (dose de 50ml)
+    $categoriasDestilados = ['destilados', 'whisky', 'vodka', 'licor'];
+
+    // Produtos específicos por ml (caso não use categoria)
+    $produtosDestilados = ['red label', 'black label', 'absolut', 'smirnoff', 'catuaba', 'jurupinga'];
+
+    // 🥩 Produtos vendidos por gramas (250g por porção)
+    if (in_array($categoria, $categoriasPorGrama) || in_array($nomeProduto, $produtosPorGrama)) {
+        return $quantidade * 250;
     }
-    
-    return $quantidade; // unidades normais
+
+    // 🥃 Destilados vendidos por dose de 50ml
+    if (in_array($categoria, $categoriasDestilados) || in_array($nomeProduto, $produtosDestilados)) {
+        return $quantidade * 50; // 50ml por dose
+    }
+
+    // 🍺 Demais produtos vendidos por unidade
+    return $quantidade;
 }
+
 
 // ✅ Função para determinar URL de redirecionamento
 function obterUrlRedirecionamento($nivel) {

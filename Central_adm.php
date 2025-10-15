@@ -14,24 +14,62 @@
     $flag = isset($_GET['flag']) ? $_GET['flag'] : '';
 
     if ($flag == 'pagar') {
-        // PEGA O VALOR DA MESA E FORMA DE PAGAMENTO
         $venMesa = intval($_GET['venMesa']);
-        $formaPag = isset($_GET['formapag']) ? htmlspecialchars(trim($_GET['formapag'])) : ''; // Sanitiza a entrada
-
-        // ATUALIZA A VENDA COM A FORMA DE PAGAMENTO E FINALIZA
-        $sql_del = "UPDATE vendas SET ven_Finalizada = 'S', ven_Formapag = ? WHERE ven_Mesa = ? AND ven_Finalizada = 'N'";
-        $stmt = $conn->prepare($sql_del);
-        $stmt->bind_param("si", $formaPag, $venMesa);
+        
+        // Se vier via GET (um único pagamento simples)
+        $formaPag = isset($_GET['formapag']) ? htmlspecialchars(trim($_GET['formapag'])) : '';
+    
+        // Se vier via POST (vários pagamentos)
+        $input = file_get_contents('php://input');
+        $data = json_decode($input, true);
+        $pagamentos = $data['pagamentos'] ?? [];
+    
+        if ($venMesa <= 0) {
+            http_response_code(400);
+            echo "ID da comanda inválido.";
+            exit;
+        }
+    
+        $pagamentoStr = '';
+    
+        // 1️⃣ — Se vierem múltiplos pagamentos via POST
+        if (!empty($pagamentos)) {
+            $parts = [];
+            foreach ($pagamentos as $pg) {
+                $forma = ucfirst(htmlspecialchars(trim($pg['forma'] ?? '')));
+                $valor = number_format(floatval($pg['valor'] ?? 0), 2, ',', '');
+                if ($forma && $valor > 0) {
+                    $parts[] = "{$forma}: {$valor}";
+                }
+            }
+            $pagamentoStr = implode(' | ', $parts);
+        } 
+        // 2️⃣ — Caso contrário, pega o único método do GET
+        elseif (!empty($formaPag)) {
+            $pagamentoStr = ucfirst($formaPag);
+        } 
+        else {
+            http_response_code(400);
+            echo "Forma de pagamento inválida.";
+            exit;
+        }
+    
+        // Atualiza no banco
+        $sql_upd = "UPDATE vendas 
+                    SET ven_Finalizada = 'S', ven_Formapag = ? 
+                    WHERE ven_Mesa = ? AND ven_Finalizada = 'N'";
+        $stmt = $conn->prepare($sql_upd);
+        $stmt->bind_param("si", $pagamentoStr, $venMesa);
         $stmt->execute();
-        $stmt->close();
-
-        // Resposta para o fetch (opcional)
+    
         if ($stmt->affected_rows > 0) {
             echo "Comanda finalizada com sucesso!";
         } else {
             http_response_code(500);
             echo "Erro ao finalizar comanda ou comanda já finalizada.";
         }
+    
+        $stmt->close();
     } elseif ($flag == 'Deletacomanda') {
         $mesa = intval($_POST['mesa'] ?? $_GET['mesa'] ?? 0);
         $delete = "DELETE FROM vendas WHERE ven_Mesa = $mesa AND ven_Finalizada <> 'S'";
@@ -328,6 +366,7 @@
         
                     // Confirmação
                     if (confirm('Deseja deletar a comanda?')) {
+                        // alert(mesa);
                         // Faça a requisição para deletar (AJAX ou redirecionamento)
                         // Exemplo com redirecionamento:
                         window.location.href = `Central_adm.php?flag=Deletacomanda&mesa=${mesa}`;
@@ -553,74 +592,93 @@
                     overlay.style.zIndex = '999'; // Abaixo do modal, acima do resto da página
                     document.body.appendChild(overlay);
 
-                        // Cria um modal simples com select para forma de pagamento
-                    const modal = document.createElement('div');
-                    modal.style.position = 'fixed';
-                    modal.style.top = '50%';
-                    modal.style.left = '50%';
-                    modal.style.transform = 'translate(-50%, -50%)';
-                    modal.style.backgroundColor = 'white';
-                    modal.style.padding = '20px';
-                    modal.style.border = '1px solid #ccc';
-                    modal.style.boxShadow = '0 0 10px rgba(0,0,0,0.5)';
-                    modal.style.zIndex = '1000';
-                    modal.style.display = 'flex';
-                    modal.style.flexDirection = 'column'; // Organiza os itens em coluna
-                    modal.style.justifyContent = 'center'; // Centraliza horizontalmente os itens internos
-                    modal.style.alignItems = 'center'; // Corrige o erro de digitação, centraliza verticalmente os itens internos
-                    modal.style.width = '300px'; // Define uma largura fixa para consistência
-                    modal.style.height = '250px';
-                    modal.style.borderRadius = '8px'; // Opcional: bordas arredondadas para melhor estética
-                    modal.innerHTML = `
-                        <h4 style='color:black;'>Selecione a Forma de Pagamento</h4>
-                        <select id="formaPagamento">
-                            <option value="">Selecione...</option>
-                            <option value="dinheiro">Dinheiro</option>
-                            <option value="credito">Cartão de Crédito</option>
-                            <option value="debito">Cartão de Débito</option>
-                            <option value="pix">PIX</option>
-                        </select>
-                        <br><br>
-                        <button class='botoesformapag' onclick="confirmarPagamento()">Confirmar</button>
-                        <button class='botoesformapag' onclick="cancelarPagamento()">Cancelar</button>
-                    `;
-                    document.body.appendChild(modal);
+// Cria um modal dinâmico com múltiplas formas de pagamento
+const modal = document.createElement('div');
+modal.style = `
+  position: fixed; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: white; padding: 20px;
+  border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  z-index: 1000; width: 350px;
+`;
+modal.innerHTML = `
+  <h4 style="text-align:center; color:black;">Formas de Pagamento</h4>
+  <div id="pagamentos"></div>
+  <button onclick="adicionarLinhaPagamento()">+ Adicionar</button>
+  <hr>
+  <button onclick="confirmarPagamento()">Confirmar</button>
+  <button onclick="cancelarPagamento()">Cancelar</button>
+`;
+document.body.appendChild(modal);
 
-                    // Funções globais para confirmar ou cancelar (devem ser acessíveis no escopo da página)
-                    window.confirmarPagamento = function() {
-                        const formaPag = document.getElementById('formaPagamento').value;
-                        if (formaPag) {
-                            fetch(`Central_adm.php?flag=pagar&venMesa=${venMesa}&formapag=${encodeURIComponent(formaPag)}`)
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error("Erro ao finalizar a comanda.");
-                                    }
-                                    return response.text();
-                                })
-                                .then(() => {
-                                    // imprimirComanda();
-                                    if (!sessionStorage.getItem('recarregado')) {
-                                        sessionStorage.setItem('recarregado', 'true');
-                                        window.location.reload();
-                                    } else {
-                                        sessionStorage.removeItem('recarregado');
-                                    }
-                                })
-                                .catch(error => {
-                                    console.error(error);
-                                    //alert("Erro ao finalizar comanda.");
-                                });
-                            document.body.removeChild(modal);
-                        } else {
-                            alert("Por favor, selecione uma forma de pagamento.");
-                        }
-                    };
+window.adicionarLinhaPagamento = function() {
+  const container = document.getElementById('pagamentos');
+  const linha = document.createElement('div');
+  linha.style = "display:flex; gap:5px; margin:5px 0;";
+  linha.innerHTML = `
+    <select class="formaPag">
+      <option value="">Forma...</option>
+      <option value="dinheiro">Dinheiro</option>
+      <option value="credito">Crédito</option>
+      <option value="debito">Débito</option>
+      <option value="pix">PIX</option>
+    </select>
+    <input type="number" class="valorPag" placeholder="Valor" step="0.01" min="0" style="width:80px;">
+    <button onclick="this.parentElement.remove()">🗑️</button>
+  `;
+  container.appendChild(linha);
+};
 
-                    window.cancelarPagamento = function() {
-                        document.body.removeChild(modal);
-                        alert("Operação cancelada.");
-                        window.location.reload();
-                    };
+// Adiciona a primeira linha automaticamente
+adicionarLinhaPagamento();
+
+window.confirmarPagamento = function() {
+  const linhas = document.querySelectorAll('#pagamentos div');
+  const pagamentos = [];
+
+  linhas.forEach(l => {
+    const forma = l.querySelector('.formaPag').value;
+    const valor = parseFloat(l.querySelector('.valorPag').value);
+    if (forma && valor > 0) {
+      pagamentos.push({ forma, valor });
+    }
+  });
+
+  if (pagamentos.length === 0) {
+    alert('Adicione ao menos uma forma de pagamento.');
+    return;
+  }
+
+  fetch('Central_adm.php?flag=pagar&venMesa=' + venMesa, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pagamentos })
+  })
+  .then(r => {
+    if (!r.ok) throw new Error('Erro ao finalizar comanda');
+    return r.text();
+  })
+  .then(() => {
+    document.body.removeChild(modal);
+    if (!sessionStorage.getItem('recarregado')) {
+      sessionStorage.setItem('recarregado', 'true');
+      window.location.reload();
+    } else {
+      sessionStorage.removeItem('recarregado');
+    }
+  })
+  .catch(e => {
+    console.error(e);
+    alert('Erro ao finalizar comanda.');
+  });
+};
+
+window.cancelarPagamento = function() {
+  document.body.removeChild(modal);
+  alert("Operação cancelada.");
+  window.location.reload();
+};
+
                     }
 
                 }

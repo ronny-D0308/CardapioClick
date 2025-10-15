@@ -104,7 +104,8 @@ $usuario = $_SESSION['usuario'];
                     <option value="Bebidas" > Bebidas </option>
                     <option value="Porcoes" > Porções </option>
                     <option value="Carnes" > Carnes </option>
-                    <option value="Bomboniere" > Bomboniere </option>
+                    <option value="Destilados" > Destilados </option>
+                    <!-- <option value="Bomboniere" > Bomboniere </option> -->
                     <!-- <option value="Limpeza" > Produtos de limpeza </option> -->
                     <!-- <option value="Embalagens" > Embalagens </option> -->
                 </select>
